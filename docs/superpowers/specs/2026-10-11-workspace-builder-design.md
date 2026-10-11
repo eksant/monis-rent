@@ -113,9 +113,9 @@ Collected on 2026-10-11 from `www.monis.rent`. The page data embedded in the sit
 
 - **Next.js** (latest stable, App Router) with **TypeScript** in strict mode.
 - **Tailwind CSS** and **shadcn/ui**: Tabs, ToggleGroup, Drawer, Card, Badge, Button, Input, Select, Calendar and Popover, Form, Tooltip, Sonner.
-- **Motion** (`motion/react`) for animations.
+- **CSS animations** (keyframes and transitions) plus a tiny `requestAnimationFrame` hook for counting totals. The Motion library turned out unnecessary.
 - **Zustand** with the `persist` middleware for setup state.
-- **react-hook-form** and **zod** for the checkout form.
+- **react-hook-form** and **zod** for the checkout form, with native `<select>` and `<input type="date">` (best on phones).
 - **Vitest** for unit tests, **Playwright** with `@axe-core/playwright` for end-to-end and accessibility tests.
 
 Rendering is fully static. All logic runs in the browser and nothing needs server secrets.
@@ -246,11 +246,11 @@ item cards (1 column; 2 on tablets)  ↕ scroll
 
 ### 7.5 Smart setup
 
-1. The user types a sentence or taps an example chip, e.g. "Full-stack dev, 6 weeks, $50/wk", "Lots of calls, bad wifi", "Video editor in Canggu, 2 months".
-2. A short staged animation runs (about 0.8 s): "Reading your brief… Picking a desk… Fitting monitors…".
-3. Items enter the scene one by one.
-4. A **"Why this setup"** card lists 2–4 reasons, for example "Standing desk: you mentioned long days" or "Monthly plan: saves $38 over 2 months".
-5. **Undo** restores the previous setup (one step).
+1. A **"Describe your work"** chip, first in the preset row, opens a sheet. The user types a sentence or taps an example chip, e.g. "Full-stack dev, 6 weeks, $50/wk", "Lots of calls, bad wifi", "Video editor in Canggu, 2 months".
+2. A short staged message runs (about 0.8 s, instant with reduced motion): "Reading your brief… Picking a desk… Fitting screens and extras…".
+3. The sheet closes and the new items drop into the scene.
+4. A toast titled **"Here's your setup"** lists 2–4 reasons that describe the final setup, for example "Webcam and headset for clear calls." If the budget forced items out, it says so ("Left out the … to stay on budget.").
+5. The toast's **Undo** restores the previous setup (one step).
 
 Unrecognised input falls back to Essentials with a friendly note. It never dead-ends.
 

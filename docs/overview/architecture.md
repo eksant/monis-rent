@@ -35,6 +35,7 @@ user action ─▶ store action ─▶ lib/setup rule ─▶ { setup, notice? }
 ## State, persistence and sharing
 
 - `Setup` = desk id, chair id or `null`, item quantities, plan (`weekly` | `monthly`) and posture (`sit` | `stand`).
+- The store also holds UI state that is not persisted (active category, search, scene view, one-step undo for smart setup) and the last order, which is persisted with the setup.
 - On first load the store hydrates in this order: URL query (shared link), then localStorage (`monis-builder`, version 1), then the Essentials preset.
 - A shared link is cleaned from the address bar after loading. Unknown ids are dropped and reported with a toast.
 - Untrusted input (URL, storage) always passes through `parseSetup` and `normalizeSetup`, so the rules hold for every setup the UI sees.
@@ -47,6 +48,13 @@ user action ─▶ store action ─▶ lib/setup rule ─▶ { setup, notice? }
 
 `d` desk, `c` chair (`none` for no chair), `i` items (`id` or `id:qty`), `p=m` monthly, `pos=stand` standing. Defaults are omitted.
 
+## Routes
+
+- `/`: the builder.
+- `/checkout`: order summary and the delivery form (react-hook-form + zod; native select and date inputs for phones).
+- `/checkout/success`: the confirmation, read from the last order in the store; it survives a reload. It says clearly that this is a concept demo.
+- `src/app/error.tsx`: route error boundary with "Try again" and "Start over".
+
 ## Layout
 
 - App shell: `h-dvh` with the header and preset bar on top; the page itself never scrolls. Only the item list and the summary list have their own scroll areas.
@@ -58,4 +66,6 @@ user action ─▶ store action ─▶ lib/setup rule ─▶ { setup, notice? }
 - One SVG `viewBox` of 400 × 250 where 1 unit = 1 cm, so desk widths are true to scale.
 - The scene is laid out at sitting height; standing lifts the desk group with a CSS transform so the change animates (and is instant with reduced motion).
 - Monitors are centred on the desk with the largest one in the middle. When a row is wider than the desk, side screens are drawn narrower, as if angled.
-- The "+" hotspots are real HTML buttons positioned over the SVG, which itself is a single `role="img"` with a text summary.
+- The "+" hotspots and the tap targets (desk, screens, chair) are real HTML buttons positioned over the SVG, which itself is a single `role="img"` with a text summary.
+- **Close-up:** a two-position view. `deskFocus()` computes a CSS `translate() scale()` for a wrapper around the SVG and the buttons, so everything zooms together; hotspots are counter-scaled and hidden when out of frame.
+- **Motion:** items drop in with a CSS keyframe animation, totals count up with `useTweenedNumber`, and everything is instant under `prefers-reduced-motion`.

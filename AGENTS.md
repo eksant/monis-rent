@@ -41,13 +41,15 @@ Next.js 16 (App Router, TypeScript strict), Tailwind CSS 4, shadcn/ui (Radix bas
 ## Code layout
 
 ```
-src/app/              routes: / (builder), /checkout
+src/app/              routes: / (builder), /checkout, /checkout/success; error.tsx
 src/data/             catalog snapshot and presets (pure data + lookups)
-src/lib/              pure logic: money, pricing, setup rules, share URL, search, scene layout
+src/lib/              pure logic: money, pricing, setup rules, share URL, search, smart setup,
+                      checkout validation, scene layout
 src/store/            Zustand store: a thin wrapper over src/lib/setup.ts
 src/components/ui/    vendored shadcn/ui primitives
 src/components/scene/ SVG scene (1 unit = 1 cm)
 src/components/builder/ builder UI
+src/components/checkout/ checkout and confirmation UI
 e2e/                  Playwright specs
 docs/                 overview, product notes, specs and plans, QA rounds, bug log
 ```

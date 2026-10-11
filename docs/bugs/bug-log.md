@@ -8,6 +8,15 @@ History of reported bugs with root cause, fix, prevention and regression test. N
 
 ---
 
+## 2026-10-11 — [FIXED] Bug sweep: chair hotspot, "1 items", chair placement, Hue lamp (BS-01…BS-04)
+
+- **Symptom:** after "Start empty" there was no way to add a chair from the scene; counts read "1 items"; standing pushed the chair in front of the fan and purifier; the Hue lamp hid behind the right monitor.
+- **Repro:** screenshots of edge states at five viewport sizes (`docs/qa/2026-10-11-milestones-4-6.md`).
+- **Root cause:** hotspots only covered screens, lamp and plant; counts were hard-coded plurals; the chair always moved right; the Hue lamp was drawn behind the monitors.
+- **Fix:** "Add a chair" hotspot (`workspace-scene.tsx`); `countLabel()` (`src/lib/text.ts`); the chair moves to the side with fewer floor items (`scene-layout.ts`); the Hue lamp is drawn in front (`desk-items.tsx`).
+- **Prevention:** edge-state screenshots are part of every milestone's QA round.
+- **Regression test:** `e2e/scene.spec.ts` › an empty setup offers a chair hotspot; `text.test.ts`; `scene-layout.test.ts` › chair placement when standing.
+
 ## 2026-10-11 — [FIXED] Landscape phones and a stretched page (CR-07, CR-08)
 
 - **Symptom:** at 844×390 the item list had almost no height. Strengthening the layout test then showed the page was 143 px taller than the screen at 375×667.
