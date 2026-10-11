@@ -1,0 +1,4 @@
+# Native builds are not needed: images are served unoptimized and lint uses no native resolver.
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
