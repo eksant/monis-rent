@@ -8,6 +8,15 @@ History of reported bugs with root cause, fix, prevention and regression test. N
 
 ---
 
+## 2026-10-11 — [FIXED] Last item of a summary group cut off (BUG-01)
+
+- **Symptom:** in the summary, the last item of an open group ("Ergonomic Laptop Stand") was cut in half by the next group header.
+- **Repro:** open a group wide, then make the names wrap (narrower window, or the Inter font finishing loading): `e2e/builder.spec.ts` › an open summary group grows with its items instead of clipping them (1600 px → 1024 px).
+- **Root cause:** the vendored shadcn `AccordionContent` (radix-nova) gives its inner wrapper `h-(--radix-accordion-content-height)`, the height Radix measures when the group opens. Content that grows afterwards overflows the `overflow-hidden` wrapper.
+- **Fix:** `GroupedLines` passes `h-auto` to `AccordionContent` (`src/components/builder/grouped-lines.tsx`); the open/close animation still uses the measured height.
+- **Prevention:** when vendoring animated-height components, check that their content can grow after opening.
+- **Regression test:** the E2E test above.
+
 ## 2026-10-11 — [FIXED] Bug sweep: chair hotspot, "1 items", chair placement, Hue lamp (BS-01…BS-04)
 
 - **Symptom:** after "Start empty" there was no way to add a chair from the scene; counts read "1 items"; standing pushed the chair in front of the fan and purifier; the Hue lamp hid behind the right monitor.

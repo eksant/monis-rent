@@ -259,6 +259,40 @@ test("removing a line from the summary can be undone", async ({
   );
 });
 
+test("an open summary group grows with its items instead of clipping them", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "the desktop summary stays open while items are added");
+  // Measured wide, then narrowed: names wrap after the group's height was taken.
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await page.getByRole("button", { name: "Founders" }).click();
+  await page.getByRole("tab", { name: "Accessories" }).click();
+  for (const id of ["webcam", "headphones", "mic-kit"]) {
+    await page
+      .getByTestId(`item-card-${id}`)
+      .getByRole("button")
+      .first()
+      .click();
+  }
+  const group = page
+    .getByTestId("summary-panel")
+    .filter({ visible: true })
+    .getByTestId("summary-group-accessory");
+  await page.setViewportSize({ width: 1024, height: 900 });
+  const content = group.locator('[data-slot="accordion-content"]');
+  const last = group.locator("li").last();
+  await last.scrollIntoViewIfNeeded();
+  const contentBox = await content.boundingBox();
+  const lastBox = await last.boundingBox();
+  expect(lastBox && contentBox).toBeTruthy();
+  if (lastBox && contentBox) {
+    expect(lastBox.y + lastBox.height).toBeLessThanOrEqual(
+      contentBox.y + contentBox.height + 0.5,
+    );
+  }
+});
+
 test("the builder has no serious accessibility violations", async ({
   page,
 }) => {

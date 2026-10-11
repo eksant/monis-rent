@@ -67,7 +67,9 @@ export function GroupedLines({
               </span>
             </AccordionPrimitive.Trigger>
           </AccordionPrimitive.Header>
-          <AccordionContent className="pb-2">
+          {/* h-auto: the vendored content locks the height measured on open, which
+              clips items when names wrap later (font load, resize). */}
+          <AccordionContent className="h-auto pb-2">
             {/* Each item gets a dot under the chevron and lines up with the label. */}
             <ul className="space-y-2 text-sm text-foreground [&>li]:relative [&>li]:pl-5.5 [&>li]:before:absolute [&>li]:before:top-[0.55em] [&>li]:before:left-1 [&>li]:before:size-1.5 [&>li]:before:rounded-full [&>li]:before:bg-accent [&>li]:before:content-['']">
               {group.lines.map((line) => renderLine(line))}
