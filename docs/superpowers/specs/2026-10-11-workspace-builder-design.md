@@ -652,11 +652,7 @@ docs/
 
 ### 13.3 What AGENTS.md defines (inputs for the `qa-fix-round` procedure)
 
-- **How a change ships:**
-  1. A branch per change, and a PR.
-  2. CI must be green.
-  3. Check the change on the Vercel preview URL.
-  4. Merge to `main`, which deploys production.
+- **How a change ships** (owner decision, 2026-10-11): a single branch, `main`. Commit and push to `main` after the full quality gate; CI runs on the push and Vercel deploys production. Failed CI runs are deleted once fixed.
 - **Where test scenarios and results live:** `e2e/` for the specs, `docs/qa/` for round results, `docs/bugs/bug-log.md` for bug history.
 - **Which data may be written:** none on any server. The app writes only to the visitor's localStorage.
 - **House rules:**

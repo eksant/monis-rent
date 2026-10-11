@@ -17,11 +17,11 @@
 | M3  | Add accessories (monitors, lamps, plants, etc.)           | Done                             | Screens, Accessories and Bali tabs     |
 | M4  | Workspace preview updates visually as items change        | Done                             | SVG scene                              |
 | M5  | Summary or checkout view of the selected setup            | Partial (summary; checkout next) | Summary panel, `/checkout`             |
-| M6  | Deployed and reachable through a public URL               | In progress (Vercel import)      | Vercel                                 |
+| M6  | Deployed and reachable through a public URL               | In progress (Vercel import)      | https://monis-rent-theta.vercel.app    |
 | M7  | Code on GitHub with `desent-bot` as a collaborator (Read) | Planned                          | `eksant/monis-rent`                    |
 
 ## Submission checklist
 
-- [ ] Live URL that works immediately
+- [x] Live URL that works immediately: https://monis-rent-theta.vercel.app
 - [ ] GitHub repository with `desent-bot` (Read access)
 - [ ] Short write-up in `README.md`: approach, tech choices, what we would improve

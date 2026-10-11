@@ -69,11 +69,14 @@ docs/                 overview, product notes, specs and plans, QA rounds, bug l
 
 ## Shipping a change
 
-1. Branch from `main`: `feat/…`, `fix/…`, `docs/…` or `chore/…`.
+The owner keeps a single branch: **`main`**. Do not create feature branches or pull requests.
+
+1. `git pull --ff-only` on `main`.
 2. Before pushing, run: `pnpm lint && pnpm type-check && pnpm format:check && pnpm test && pnpm build && pnpm test:e2e`.
-3. Open a pull request. CI must be green.
-4. Check the change on the Vercel preview URL posted on the PR.
-5. Merge to `main`; Vercel deploys production. Re-run `BASE_URL=<production URL> pnpm test:e2e`.
+3. Commit (Conventional Commits) and `git push`. CI runs on the push and Vercel deploys production.
+4. Watch CI with `gh run watch`. If a run fails, fix it, push again, and then **delete the failed runs** (`gh run list --status failure`, `gh run delete <id>`), so the Actions history only shows the resolved state.
+5. Check production: `BASE_URL=https://monis-rent-theta.vercel.app pnpm test:e2e`.
+6. For larger changes, have an independent reviewer read the diff before pushing.
 
 ## QA and bugs
 
@@ -87,4 +90,4 @@ These are the project-specific inputs for the `qa-fix-round` procedure.
 
 ## Deployment
 
-Vercel project linked to `eksant/monis-rent` through Git integration: `main` deploys production, every PR gets a preview. No environment variables are needed. See `docs/overview/deployment.md`.
+Vercel project linked to `eksant/monis-rent` through Git integration: every push to `main` deploys production at https://monis-rent-theta.vercel.app. No environment variables are needed. See `docs/overview/deployment.md`.
