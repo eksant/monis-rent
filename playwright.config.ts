@@ -18,8 +18,17 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"] } },
-    { name: "mobile", use: { ...devices["Pixel 7"] } },
+    // Device-specific tests are tagged and never scheduled on the other device.
+    {
+      name: "desktop",
+      use: { ...devices["Desktop Chrome"] },
+      grepInvert: /@mobile-only/,
+    },
+    {
+      name: "mobile",
+      use: { ...devices["Pixel 7"] },
+      grepInvert: /@desktop-only/,
+    },
   ],
   webServer:
     baseURL === LOCAL_URL

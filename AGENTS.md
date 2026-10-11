@@ -67,7 +67,7 @@ docs/                 overview, product notes, specs and plans, QA rounds, bug l
 - **Setup changes** go through `src/lib/setup.ts`, which returns `{ setup, notice? }`. Never mutate a setup in a component.
 - **Catalog honesty:** the catalog is a dated snapshot (`docs/product/catalog-notes.md`). Concept items have no slug and always show a "Concept" badge. Never promise free delivery or a real order.
 - **shadcn/ui:** add components with `pnpm dlx shadcn@4.21.4 add <name>`, then `pnpm lint:fix && pnpm format`. Only the rules listed in the `src/components/ui/**` block of `eslint.config.mjs` are relaxed there.
-- **Tests:** every behaviour change ships with a test. Unit tests sit next to the code (`*.test.ts`); user flows go in `e2e/`.
+- **Tests:** every behaviour change ships with a test. Unit tests sit next to the code (`*.test.ts`); user flows go in `e2e/`. E2E runs on a `desktop` and a `mobile` project; a test that only applies to one of them gets the tag `@desktop-only` or `@mobile-only` (filtered by `grepInvert`), not `test.skip`, so a non-zero skip count always means something needs a look.
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `refactor:`).
 
 ## Shipping a change

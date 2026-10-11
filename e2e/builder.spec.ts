@@ -125,17 +125,17 @@ test("the setup survives a reload", async ({ page, isMobile }) => {
   await closeSummary(page, isMobile);
 });
 
-test("mobile shows a sticky price bar that opens the summary", async ({
-  page,
-  isMobile,
-}) => {
-  test.skip(!isMobile, "mobile only");
-  await expect(page.getByTestId("price-bar")).toBeVisible();
-  const summary = await openSummary(page, isMobile);
-  await expect(
-    summary.getByRole("link", { name: "Rent this setup" }),
-  ).toBeVisible();
-});
+test(
+  "mobile shows a sticky price bar that opens the summary",
+  { tag: "@mobile-only" },
+  async ({ page, isMobile }) => {
+    await expect(page.getByTestId("price-bar")).toBeVisible();
+    const summary = await openSummary(page, isMobile);
+    await expect(
+      summary.getByRole("link", { name: "Rent this setup" }),
+    ).toBeVisible();
+  },
+);
 
 test("search finds items across categories", async ({ page }) => {
   const search = page.getByTestId("catalog-search");
@@ -155,11 +155,14 @@ test("search finds items across categories", async ({ page }) => {
   await expect(page.getByRole("tab", { name: "Desk" })).toBeVisible();
 });
 
-test("slash focuses the search on desktop", async ({ page, isMobile }) => {
-  test.skip(isMobile, "keyboard shortcut is desktop only");
-  await page.keyboard.press("/");
-  await expect(page.getByTestId("catalog-search")).toBeFocused();
-});
+test(
+  "slash focuses the search on desktop",
+  { tag: "@desktop-only" },
+  async ({ page }) => {
+    await page.keyboard.press("/");
+    await expect(page.getByTestId("catalog-search")).toBeFocused();
+  },
+);
 
 test("a selected single-unit screen is removed by tapping its card", async ({
   page,
@@ -210,17 +213,17 @@ test("cards fall back to an icon when product photos fail", async ({
   ).toBeVisible();
 });
 
-test("the mobile price bar announces total changes", async ({
-  page,
-  isMobile,
-}) => {
-  test.skip(!isMobile, "mobile only");
-  const live = page.getByTestId("price-bar-live");
-  await expect(live).toHaveAttribute("aria-live", "polite");
-  await expect(live).toHaveText("$12.70 per week");
-  await page.getByRole("button", { name: "Founders" }).click();
-  await expect(live).toHaveText("$47.45 per week");
-});
+test(
+  "the mobile price bar announces total changes",
+  { tag: "@mobile-only" },
+  async ({ page }) => {
+    const live = page.getByTestId("price-bar-live");
+    await expect(live).toHaveAttribute("aria-live", "polite");
+    await expect(live).toHaveText("$12.70 per week");
+    await page.getByRole("button", { name: "Founders" }).click();
+    await expect(live).toHaveText("$47.45 per week");
+  },
+);
 
 test("counts use the singular for one item", async ({ page, isMobile }) => {
   await page.getByRole("button", { name: "Start empty" }).click();
@@ -259,39 +262,39 @@ test("removing a line from the summary can be undone", async ({
   );
 });
 
-test("an open summary group grows with its items instead of clipping them", async ({
-  page,
-  isMobile,
-}) => {
-  test.skip(isMobile, "the desktop summary stays open while items are added");
-  // Measured wide, then narrowed: names wrap after the group's height was taken.
-  await page.setViewportSize({ width: 1600, height: 900 });
-  await page.getByRole("button", { name: "Founders" }).click();
-  await page.getByRole("tab", { name: "Accessories" }).click();
-  for (const id of ["webcam", "headphones", "mic-kit"]) {
-    await page
-      .getByTestId(`item-card-${id}`)
-      .getByRole("button")
-      .first()
-      .click();
-  }
-  const group = page
-    .getByTestId("summary-panel")
-    .filter({ visible: true })
-    .getByTestId("summary-group-accessory");
-  await page.setViewportSize({ width: 1024, height: 900 });
-  const content = group.locator('[data-slot="accordion-content"]');
-  const last = group.locator("li").last();
-  await last.scrollIntoViewIfNeeded();
-  const contentBox = await content.boundingBox();
-  const lastBox = await last.boundingBox();
-  expect(lastBox && contentBox).toBeTruthy();
-  if (lastBox && contentBox) {
-    expect(lastBox.y + lastBox.height).toBeLessThanOrEqual(
-      contentBox.y + contentBox.height + 0.5,
-    );
-  }
-});
+test(
+  "an open summary group grows with its items instead of clipping them",
+  { tag: "@desktop-only" },
+  async ({ page }) => {
+    // Measured wide, then narrowed: names wrap after the group's height was taken.
+    await page.setViewportSize({ width: 1600, height: 900 });
+    await page.getByRole("button", { name: "Founders" }).click();
+    await page.getByRole("tab", { name: "Accessories" }).click();
+    for (const id of ["webcam", "headphones", "mic-kit"]) {
+      await page
+        .getByTestId(`item-card-${id}`)
+        .getByRole("button")
+        .first()
+        .click();
+    }
+    const group = page
+      .getByTestId("summary-panel")
+      .filter({ visible: true })
+      .getByTestId("summary-group-accessory");
+    await page.setViewportSize({ width: 1024, height: 900 });
+    const content = group.locator('[data-slot="accordion-content"]');
+    const last = group.locator("li").last();
+    await last.scrollIntoViewIfNeeded();
+    const contentBox = await content.boundingBox();
+    const lastBox = await last.boundingBox();
+    expect(lastBox && contentBox).toBeTruthy();
+    if (lastBox && contentBox) {
+      expect(lastBox.y + lastBox.height).toBeLessThanOrEqual(
+        contentBox.y + contentBox.height + 0.5,
+      );
+    }
+  },
+);
 
 test("the builder has no serious accessibility violations", async ({
   page,
