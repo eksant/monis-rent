@@ -161,6 +161,67 @@ test("slash focuses the search on desktop", async ({ page, isMobile }) => {
   await expect(page.getByTestId("catalog-search")).toBeFocused();
 });
 
+test("a selected single-unit screen is removed by tapping its card", async ({
+  page,
+  isMobile,
+}) => {
+  await page.getByRole("button", { name: "Trading" }).click();
+  await page.getByRole("tab", { name: "Screens" }).click();
+  await expect(page.getByTestId("qty-mon-34-gaming")).toHaveCount(0);
+  await addFromCard(page, "mon-34-gaming");
+  await expect(page.getByTestId("scene-monitor-mon-34-gaming")).toHaveCount(0);
+  const summary = await openSummary(page, isMobile);
+  await expect(summary.getByTestId("summary-line-mon-34-gaming")).toHaveCount(
+    0,
+  );
+});
+
+test("item cards expose price and badges to assistive tech", async ({
+  page,
+}) => {
+  const card = page
+    .getByTestId("item-card-desk-electric")
+    .getByRole("button")
+    .first();
+  await expect(card).toHaveAccessibleName("Electrical Adjustable Desk");
+  await expect(card).toHaveAccessibleDescription(/\$4\.90/);
+  await expect(card).toHaveAccessibleDescription(/−30%/);
+});
+
+test("concept items are labelled in the summary", async ({
+  page,
+  isMobile,
+}) => {
+  await page.getByRole("tab", { name: "Chair" }).click();
+  await addFromCard(page, "chair-basic");
+  const summary = await openSummary(page, isMobile);
+  await expect(summary.getByTestId("summary-line-chair-basic")).toContainText(
+    "Concept",
+  );
+});
+
+test("cards fall back to an icon when product photos fail", async ({
+  page,
+}) => {
+  await page.route("https://strapi.monis.rent/**", (route) => route.abort());
+  await page.reload();
+  await expect(
+    page.getByTestId("item-card-desk-electric").getByTestId("thumb-fallback"),
+  ).toBeVisible();
+});
+
+test("the mobile price bar announces total changes", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile, "mobile only");
+  const live = page.getByTestId("price-bar-live");
+  await expect(live).toHaveAttribute("aria-live", "polite");
+  await expect(live).toHaveText("$12.70 per week");
+  await page.getByRole("button", { name: "Founders" }).click();
+  await expect(live).toHaveText("$47.45 per week");
+});
+
 test("the builder has no serious accessibility violations", async ({
   page,
 }) => {

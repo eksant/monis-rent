@@ -23,7 +23,7 @@ export function PriceBar() {
   const count = lines.reduce((sum, line) => sum + line.qty, 0);
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgb(21_37_46/0.06)] backdrop-blur lg:hidden">
-      <div className="mx-auto flex h-16 max-w-3xl items-center gap-3 px-3 sm:px-4">
+      <div className="mx-auto flex h-16 max-w-3xl items-center gap-3 px-3 sm:px-4 short:h-14">
         <Drawer>
           <DrawerTrigger asChild>
             <button
@@ -51,6 +51,14 @@ export function PriceBar() {
                 aria-hidden
               />
               <span className="sr-only">View setup</span>
+              <span
+                className="sr-only"
+                aria-live="polite"
+                data-testid="price-bar-live"
+              >
+                {formatCents(totalCents)} per{" "}
+                {plan === "weekly" ? "week" : "month"}
+              </span>
             </button>
           </DrawerTrigger>
           <DrawerContent>

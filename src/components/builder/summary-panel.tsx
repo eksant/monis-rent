@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { PlanToggle } from "@/components/builder/plan-toggle";
 import { useSetupSummary } from "@/components/builder/use-setup-summary";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { matchingPresetId, PRESETS } from "@/data/presets";
 import { formatCents } from "@/lib/money";
@@ -43,6 +44,11 @@ export function SummaryPanel() {
             <span className="line-clamp-2 min-w-0 flex-1 leading-snug">
               {qty > 1 ? `${String(qty)} × ` : ""}
               {item.name}
+              {item.concept ? (
+                <Badge variant="secondary" className="ml-1.5 align-middle">
+                  Concept
+                </Badge>
+              ) : null}
             </span>
             <span className="shrink-0 tabular-nums">
               {formatCents(qty * effectiveCents(item, setup.plan))}
@@ -53,7 +59,7 @@ export function SummaryPanel() {
                 onClick={() => {
                   showCategory("desk");
                 }}
-                className="-my-1 shrink-0 rounded px-1 py-1 text-xs text-muted-foreground underline-offset-2 hover:underline"
+                className="-my-1.5 min-h-8 shrink-0 rounded px-2 text-xs text-muted-foreground underline-offset-2 hover:underline"
               >
                 Swap
               </button>
@@ -64,7 +70,7 @@ export function SummaryPanel() {
                 onClick={() => {
                   remove(item.id);
                 }}
-                className="-my-1 flex size-7 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+                className="-my-1.5 flex size-8 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <X className="size-3.5" aria-hidden />
               </button>

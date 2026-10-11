@@ -14,7 +14,7 @@ export function NoticeToasts() {
     if (notice === null) return;
     const { action } = notice;
     toast(notice.message, {
-      id: notice.id,
+      id: `notice-${String(notice.id)}`,
       action:
         action === undefined
           ? undefined
