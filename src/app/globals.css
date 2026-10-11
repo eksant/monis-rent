@@ -80,9 +80,43 @@
   --radius: 0.75rem;
 }
 
+/* Soft fade at the bottom of a scroll area: there is more below. */
+@utility scroll-fade {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    /* Thin, rounded scrollbars in the brand colours (Chrome, Firefox). */
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--foreground) 22%, transparent)
+      transparent;
+  }
+  /* Safari still needs the WebKit pseudo-elements. */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 9999px;
+    background: color-mix(in oklab, var(--foreground) 22%, transparent)
+      padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in oklab, var(--foreground) 38%, transparent);
+  }
+  [data-scroll-area] {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-scroll-area] {
+      scroll-behavior: auto;
+    }
   }
   body {
     @apply bg-background text-foreground;

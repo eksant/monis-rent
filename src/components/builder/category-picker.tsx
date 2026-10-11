@@ -202,7 +202,7 @@ export function CategoryPicker() {
   const query = useSetupStore((state) => state.search);
   const searching = query.trim() !== "";
   const scrollArea =
-    "min-h-0 flex-1 overflow-y-auto overscroll-contain pb-2 lg:pr-1";
+    "scroll-fade min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6 lg:pr-1";
   return (
     <div id="picker" className="flex min-h-0 flex-1 flex-col gap-2">
       <CatalogSearch />
@@ -218,7 +218,7 @@ export function CategoryPicker() {
           }}
           className="min-h-0 flex-1"
         >
-          <div className="-mx-3 shrink-0 overflow-x-auto px-3 sm:mx-0 sm:px-0">
+          <div className="-mx-3 shrink-0 [scrollbar-width:none] overflow-x-auto px-3 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
             <TabsList className="h-10 w-max min-w-full sm:w-full">
               {TABS.map((tab) => (
                 <TabsTrigger

@@ -30,7 +30,7 @@ export function OrderSummary() {
       <GroupedLines
         lines={lines}
         plan={plan}
-        className="max-h-60 overflow-y-auto overscroll-contain pr-1 lg:max-h-[45dvh]"
+        className="max-h-60 scroll-fade overflow-y-auto overscroll-contain pr-1 pb-4 lg:max-h-[45dvh]"
         renderLine={({ item, qty }) => (
           <li key={item.id} className="flex items-start gap-2">
             <span className="min-w-0 flex-1 leading-snug">
