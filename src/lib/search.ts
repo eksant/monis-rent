@@ -12,18 +12,19 @@ const CATEGORY_WORDS: Record<CategoryId, string> = {
 };
 
 // Words people type that the catalog text does not always contain.
-const SYNONYMS: Record<string, string[]> = {
-  screen: ["monitor", "display"],
-  display: ["monitor", "screen"],
-  monitor: ["screen", "display"],
-  wifi: ["wi-fi", "router", "internet", "starlink"],
-  internet: ["wi-fi", "router", "starlink"],
-  light: ["lamp", "lighting"],
-  lamp: ["light"],
-  computer: ["mac", "laptop"],
-  coffee: ["espresso", "nespresso"],
-  table: ["desk"],
-};
+// A Map, so words like "constructor" never hit Object.prototype.
+const SYNONYMS = new Map<string, string[]>([
+  ["screen", ["monitor", "display"]],
+  ["display", ["monitor", "screen"]],
+  ["monitor", ["screen", "display"]],
+  ["wifi", ["wi-fi", "router", "internet", "starlink"]],
+  ["internet", ["wi-fi", "router", "starlink"]],
+  ["light", ["lamp", "lighting"]],
+  ["lamp", ["light"]],
+  ["computer", ["mac", "laptop"]],
+  ["coffee", ["espresso", "nespresso"]],
+  ["table", ["desk"]],
+]);
 
 // Lower-cased words of a text; hyphenated words also contribute their parts.
 function wordsOf(text: string): string[] {
@@ -55,7 +56,7 @@ function formsOf(word: string): string[] {
   const forms = new Set([word]);
   if (word.length > 3 && word.endsWith("s")) forms.add(word.slice(0, -1));
   for (const form of [...forms]) {
-    for (const synonym of SYNONYMS[form] ?? []) forms.add(synonym);
+    for (const synonym of SYNONYMS.get(form) ?? []) forms.add(synonym);
   }
   return [...forms];
 }

@@ -73,4 +73,12 @@ describe("searchCatalog", () => {
   it("returns nothing when no item matches", () => {
     expect(searchCatalog("xyzzy")).toEqual([]);
   });
+
+  it("ignores words that are Object prototype keys", () => {
+    expect(() => searchCatalog("constructor")).not.toThrow();
+    expect(() =>
+      searchCatalog("__proto__ constructors toString"),
+    ).not.toThrow();
+    expect(searchCatalog("constructor")).toEqual([]);
+  });
 });
