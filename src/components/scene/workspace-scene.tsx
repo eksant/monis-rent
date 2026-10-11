@@ -52,7 +52,7 @@ export function WorkspaceScene({
   view?: "room" | "desk";
   // Without handlers the scene is display-only (no "+" hotspots, no tap targets).
   onHotspot?: (category: CategoryId) => void;
-  onEdit?: (category: CategoryId) => void;
+  onEdit?: (category: CategoryId, itemId: string, closeUp: boolean) => void;
 }) {
   // Lay out at sitting height and lift with a CSS transform so posture changes animate.
   const sitting = layoutScene({ ...setup, posture: "sit" });
@@ -194,7 +194,7 @@ export function WorkspaceScene({
             aria-label={target.label}
             title={target.label}
             onClick={() => {
-              onEdit?.(target.category);
+              onEdit?.(target.category, target.itemId, target.closeUp);
             }}
             className="absolute rounded-md transition hover:bg-accent/10 hover:ring-2 hover:ring-accent/50 focus-visible:ring-3 focus-visible:ring-ring/60 focus-visible:outline-none"
             style={{

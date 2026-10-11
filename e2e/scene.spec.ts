@@ -81,3 +81,27 @@ test("dragging the close-up looks around without opening anything", async ({
     "false",
   );
 });
+
+test("tapping things on the floor and shelves shows them in the list", async ({
+  page,
+}) => {
+  await page.goto(
+    "/?d=desk-electric&c=chair-ergo&i=plant-monstera,nespresso,router,tower-fan",
+  );
+  await page.getByRole("button", { name: "Change coffee machine" }).click();
+  await expect(page.getByRole("tab", { name: "Bali" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await expect(page.getByTestId("item-card-nespresso")).toBeInViewport();
+  await page.getByRole("button", { name: "Change plants" }).click();
+  await expect(page.getByRole("tab", { name: "Accessories" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await expect(page.getByTestId("item-card-plant-monstera")).toBeInViewport();
+  await expect(page.getByTestId("scene-frame")).toHaveAttribute(
+    "data-view",
+    "room",
+  );
+});

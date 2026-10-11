@@ -1,6 +1,7 @@
 "use client";
 
 import { Armchair } from "lucide-react";
+import { useEffect } from "react";
 
 import { CatalogSearch } from "@/components/builder/catalog-search";
 import { ItemCard } from "@/components/builder/item-card";
@@ -158,7 +159,44 @@ function SearchResults({ query }: { query: string }) {
 }
 
 // Search on top; below it either search results or the category tabs, in a scroll area.
+// Scrolls the list to a card tapped in the scene and flashes it briefly.
+function useFocusCard(): void {
+  const request = useSetupStore((state) => state.focusRequest);
+  useEffect(() => {
+    if (request === null) return;
+    const frame = requestAnimationFrame(() => {
+      const card = document.querySelector<HTMLElement>(
+        `[data-testid="item-card-${request.itemId}"]`,
+      );
+      const area = card?.closest<HTMLElement>("[data-scroll-area]");
+      if (card === null || area === null || area === undefined) return;
+      const reduce = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      const offset =
+        card.getBoundingClientRect().top - area.getBoundingClientRect().top;
+      area.scrollTo({
+        top: area.scrollTop + offset - 8,
+        behavior: reduce ? "auto" : "smooth",
+      });
+      if (!reduce) {
+        card.animate(
+          [
+            { boxShadow: "0 0 0 4px rgb(99 174 253 / 0.9)" },
+            { boxShadow: "0 0 0 0 rgb(99 174 253 / 0)" },
+          ],
+          { duration: 1400, easing: "ease-out" },
+        );
+      }
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+    };
+  }, [request]);
+}
+
 export function CategoryPicker() {
+  useFocusCard();
   const active = useSetupStore((state) => state.activeCategory);
   const showCategory = useSetupStore((state) => state.showCategory);
   const query = useSetupStore((state) => state.search);
@@ -169,7 +207,7 @@ export function CategoryPicker() {
     <div id="picker" className="flex min-h-0 flex-1 flex-col gap-2">
       <CatalogSearch />
       {searching ? (
-        <div className={scrollArea}>
+        <div className={scrollArea} data-scroll-area>
           <SearchResults query={query} />
         </div>
       ) : (
@@ -198,6 +236,7 @@ export function CategoryPicker() {
               key={tab.id}
               value={tab.id}
               className={cn(scrollArea, "space-y-4")}
+              data-scroll-area
             >
               {tab.id === "chair" ? <NoChairCard /> : null}
               <ItemGroups

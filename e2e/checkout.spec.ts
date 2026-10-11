@@ -79,6 +79,7 @@ test("checkout pages have no serious accessibility violations", async ({
   page,
 }) => {
   await goToCheckout(page);
+  await expect(page).toHaveTitle(/Checkout/);
   const scan = async (): Promise<string[]> => {
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa"])
@@ -91,5 +92,7 @@ test("checkout pages have no serious accessibility violations", async ({
   await fillValidRequest(page);
   await page.getByRole("button", { name: "Send rental request" }).click();
   await expect(page.getByTestId("order-reference")).toBeVisible();
+  // Client navigation updates <title> a moment after the content.
+  await expect(page).toHaveTitle(/Request received/);
   expect(await scan()).toEqual([]);
 });

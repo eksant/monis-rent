@@ -236,6 +236,9 @@ export interface SceneTarget {
   key: string;
   label: string;
   category: CategoryId;
+  itemId: string;
+  // Desk-level things zoom into the close-up; floor and shelf items do not.
+  closeUp: boolean;
   x: number;
   y: number;
   width: number;
@@ -245,14 +248,91 @@ export interface SceneTarget {
 const CHAIR_HALF_WIDTH = 26;
 const CHAIR_HEIGHT = 114;
 
-// Tap areas over the desk, each screen and the chair that open their category.
+export interface FloorSpot {
+  id: string;
+  // Centre of the item on the floor, in scene units.
+  x: number;
+  width: number;
+  height: number;
+}
+
+export interface FloorLayout {
+  plants: FloorSpot[];
+  climate: FloorSpot[];
+  internet: "router" | "starlink" | null;
+  coffee: boolean;
+}
+
+const PLANT_SIZE: Record<string, { width: number; height: number }> = {
+  "plant-monstera": { width: 40, height: 66 },
+  "plant-snake": { width: 18, height: 52 },
+};
+const CLIMATE: { id: string; width: number; height: number; step: number }[] = [
+  { id: "tower-fan", width: 18, height: 72, step: 22 },
+  { id: "purifier", width: 22, height: 46, step: 30 },
+  { id: "dehumidifier", width: 26, height: 40, step: 34 },
+];
+// Wall shelves, left for internet gear and right for the coffee machine.
+export const SHELVES = {
+  internet: { x: 22, y: 88, width: 70, height: 28 },
+  coffee: { x: 308, y: 90, width: 70, height: 26 },
+} as const;
+
+// Plants stand left of the desk, climate gear right of it.
+export function layoutFloor(
+  setup: Setup,
+  desk: { x: number; width: number },
+): FloorLayout {
+  const qty = (id: string): number => setup.items[id] ?? 0;
+  const plants = CATALOG.filter((entry) => entry.slot === "plant")
+    .flatMap((entry) => Array.from({ length: qty(entry.id) }, () => entry.id))
+    .map((id, index) => ({
+      id,
+      x: desk.x - 30 - index * 34,
+      ...(PLANT_SIZE[id] ?? { width: 30, height: 60 }),
+    }));
+  let cursor = desk.x + desk.width + 26;
+  const climate = CLIMATE.filter((spot) => qty(spot.id) > 0).map((spot) => {
+    const placed = {
+      id: spot.id,
+      x: cursor,
+      width: spot.width,
+      height: spot.height,
+    };
+    cursor += spot.step;
+    return placed;
+  });
+  const internet =
+    qty("starlink") > 0 ? "starlink" : qty("router") > 0 ? "router" : null;
+  return { plants, climate, internet, coffee: qty("nespresso") > 0 };
+}
+
+// Tap areas over everything in the scene that opens its place in the picker.
 export function sceneTargets(setup: Setup, layout: SceneLayout): SceneTarget[] {
   const { desk } = layout;
+  const floor = layoutFloor(setup, desk);
+  const onFloor = (
+    spot: FloorSpot,
+    label: string,
+    category: CategoryId,
+  ): SceneTarget => ({
+    key: `${spot.id}-${String(spot.x)}`,
+    label,
+    category,
+    itemId: spot.id,
+    closeUp: false,
+    x: spot.x - spot.width / 2,
+    y: SCENE.floorY - spot.height,
+    width: spot.width,
+    height: spot.height,
+  });
   const targets: SceneTarget[] = [
     {
       key: "desk",
       label: "Change desk",
       category: "desk",
+      itemId: setup.deskId,
+      closeUp: true,
       x: desk.x,
       y: desk.y - 2,
       width: desk.width,
@@ -262,17 +342,45 @@ export function sceneTargets(setup: Setup, layout: SceneLayout): SceneTarget[] {
       key: monitor.key,
       label: "Change screens",
       category: "screen" as const,
+      itemId: monitor.item.id,
+      closeUp: true,
       x: monitor.x,
       y: monitor.y,
       width: monitor.width,
       height: monitor.height,
     })),
+    ...floor.plants.map((spot) => onFloor(spot, "Change plants", "accessory")),
+    ...floor.climate.map((spot) =>
+      onFloor(spot, `Change ${getItem(spot.id).name}`, "extra"),
+    ),
   ];
+  if (floor.internet !== null) {
+    targets.push({
+      key: "internet",
+      label: "Change internet",
+      category: "extra",
+      itemId: floor.internet,
+      closeUp: false,
+      ...SHELVES.internet,
+    });
+  }
+  if (floor.coffee) {
+    targets.push({
+      key: "coffee",
+      label: "Change coffee machine",
+      category: "extra",
+      itemId: "nespresso",
+      closeUp: false,
+      ...SHELVES.coffee,
+    });
+  }
   if (setup.chairId !== null) {
     targets.push({
       key: "chair",
       label: "Change chair",
       category: "chair",
+      itemId: setup.chairId,
+      closeUp: true,
       x: layout.chairCenterX - CHAIR_HALF_WIDTH,
       y: SCENE.floorY - CHAIR_HEIGHT,
       width: 2 * CHAIR_HALF_WIDTH,

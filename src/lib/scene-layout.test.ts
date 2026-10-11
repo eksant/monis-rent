@@ -7,6 +7,7 @@ import {
   deskFocus,
   type FocusTransform,
   isInFrame,
+  layoutFloor,
   layoutScene,
   MONITOR_OVERHANG,
   monitorSize,
@@ -256,5 +257,57 @@ describe("panFocus", () => {
 
   it("cannot move the room view", () => {
     expect(panFocus(ROOM_VIEW, 20, 20)).toEqual(ROOM_VIEW);
+  });
+});
+
+describe("layoutFloor", () => {
+  it("lines plants up left of the desk and climate gear right of it", () => {
+    const setup: Setup = {
+      ...emptySetup(),
+      items: {
+        "plant-monstera": 1,
+        "plant-snake": 1,
+        purifier: 1,
+        "tower-fan": 1,
+      },
+    };
+    const { desk } = layoutScene(setup);
+    const floor = layoutFloor(setup, desk);
+    expect(floor.plants.map((spot) => [spot.id, spot.x])).toEqual([
+      ["plant-monstera", desk.x - 30],
+      ["plant-snake", desk.x - 64],
+    ]);
+    expect(floor.climate.map((spot) => [spot.id, spot.x])).toEqual([
+      ["tower-fan", desk.x + desk.width + 26],
+      ["purifier", desk.x + desk.width + 48],
+    ]);
+    expect(floor.internet).toBeNull();
+    expect(floor.coffee).toBe(false);
+  });
+});
+
+describe("sceneTargets on the floor and shelves", () => {
+  it("adds tap targets for plants, climate gear, internet and coffee", () => {
+    const setup: Setup = {
+      ...emptySetup(),
+      chairId: "chair-ergo",
+      items: { "plant-snake": 1, dehumidifier: 1, starlink: 1, nespresso: 1 },
+    };
+    const targets = sceneTargets(setup, layoutScene(setup));
+    expect(
+      targets.map((target) => [
+        target.label,
+        target.category,
+        target.itemId,
+        target.closeUp,
+      ]),
+    ).toEqual([
+      ["Change desk", "desk", "desk-electric", true],
+      ["Change plants", "accessory", "plant-snake", false],
+      ["Change Smart Dehumidifier Lite", "extra", "dehumidifier", false],
+      ["Change internet", "extra", "starlink", false],
+      ["Change coffee machine", "extra", "nespresso", false],
+      ["Change chair", "chair", "chair-ergo", true],
+    ]);
   });
 });

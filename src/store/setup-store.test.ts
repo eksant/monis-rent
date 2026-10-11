@@ -134,4 +134,17 @@ describe("setup store", () => {
     store.undoSuggestion();
     expect(useSetupStore.getState().setup).toEqual(before);
   });
+
+  it("asks the picker to show a tapped floor item without zooming in", () => {
+    const store = useSetupStore.getState();
+    store.editFromScene("extra", "nespresso", false);
+    const first = useSetupStore.getState();
+    expect(first.activeCategory).toBe("extra");
+    expect(first.view).toBe("room");
+    expect(first.focusRequest?.itemId).toBe("nespresso");
+    store.editFromScene("extra", "nespresso", false);
+    expect(useSetupStore.getState().focusRequest?.seq).toBeGreaterThan(
+      first.focusRequest?.seq ?? 0,
+    );
+  });
 });

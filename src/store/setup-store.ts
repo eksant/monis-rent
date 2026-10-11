@@ -35,6 +35,12 @@ export interface StoreNotice extends Notice {
 
 export type SceneView = "room" | "desk";
 
+// Asks the picker to scroll to an item card; `seq` makes repeat taps count.
+export interface FocusRequest {
+  itemId: string;
+  seq: number;
+}
+
 export interface SetupState {
   setup: Setup;
   hydrated: boolean;
@@ -44,6 +50,7 @@ export interface SetupState {
   view: SceneView;
   lastOrder: Order | null;
   previousSetup: Setup | null;
+  focusRequest: FocusRequest | null;
   hydrate: () => Promise<void>;
   applyPreset: (id: PresetId) => void;
   startEmpty: () => void;
@@ -57,7 +64,11 @@ export interface SetupState {
   showCategory: (category: CategoryId) => void;
   setSearch: (query: string) => void;
   setView: (view: SceneView) => void;
-  editFromScene: (category: CategoryId) => void;
+  editFromScene: (
+    category: CategoryId,
+    itemId?: string,
+    closeUp?: boolean,
+  ) => void;
   placeOrder: (order: Order) => void;
   startNewSetup: () => void;
   applySuggestion: (setup: Setup) => void;
@@ -113,6 +124,7 @@ export const useSetupStore = create<SetupState>()(
         view: "room",
         lastOrder: null,
         previousSetup: null,
+        focusRequest: null,
         hydrate: async () => {
           if (get().hydrated) return;
           const shared = decodeSetup(window.location.search);
@@ -199,8 +211,15 @@ export const useSetupStore = create<SetupState>()(
           });
         },
         // Tapping the desk, a screen or the chair in the scene.
-        editFromScene: (category) => {
-          set({ activeCategory: category, search: "", view: "desk" });
+        editFromScene: (category, itemId, closeUp = true) => {
+          noticeSeq += 1;
+          set({
+            activeCategory: category,
+            search: "",
+            view: closeUp ? "desk" : get().view,
+            focusRequest:
+              itemId === undefined ? null : { itemId, seq: noticeSeq },
+          });
         },
       };
     },

@@ -1,5 +1,4 @@
-import { CATALOG } from "@/data/catalog";
-import { SCENE } from "@/lib/scene-layout";
+import { layoutFloor, SCENE } from "@/lib/scene-layout";
 import type { Setup } from "@/lib/types";
 
 const has = (setup: Setup, id: string): boolean => (setup.items[id] ?? 0) > 0;
@@ -77,29 +76,17 @@ export function FloorItems({
 }) {
   const floor = SCENE.floorY;
   const right = desk.x + desk.width;
-  const plants = CATALOG.filter((entry) => entry.slot === "plant").flatMap(
-    (entry) =>
-      Array.from({ length: setup.items[entry.id] ?? 0 }, () => entry.id),
-  );
-  const climate = ["tower-fan", "purifier", "dehumidifier"].filter((id) =>
-    has(setup, id),
-  );
-  const internet = has(setup, "starlink")
-    ? "starlink"
-    : has(setup, "router")
-      ? "router"
-      : null;
-  let cursor = right + 26;
+  // Positions come from layoutFloor so the tap targets line up with the art.
+  const { plants, climate, internet } = layoutFloor(setup, desk);
   return (
     <g>
-      {plants.map((id, index) => {
-        const x = desk.x - 30 - index * 34;
-        return id === "plant-monstera" ? (
-          <Monstera key={`${id}-${String(index)}`} x={x} />
+      {plants.map(({ id, x }) =>
+        id === "plant-monstera" ? (
+          <Monstera key={`${id}-${String(x)}`} x={x} />
         ) : (
-          <SnakePlant key={`${id}-${String(index)}`} x={x} />
-        );
-      })}
+          <SnakePlant key={`${id}-${String(x)}`} x={x} />
+        ),
+      )}
       {has(setup, "extension-cable") ? (
         <path
           className="animate-drop-in"
@@ -110,12 +97,14 @@ export function FloorItems({
           fill="none"
         />
       ) : null}
-      {climate.map((id) => {
-        const x = cursor;
+      {climate.map(({ id, x }) => {
         if (id === "tower-fan") {
-          cursor += 22;
           return (
-            <g key={id} data-testid="scene-item-tower-fan">
+            <g
+              key={id}
+              className="animate-drop-in"
+              data-testid="scene-item-tower-fan"
+            >
               <rect
                 x={x - 6}
                 y={floor - 72}
@@ -145,9 +134,12 @@ export function FloorItems({
           );
         }
         if (id === "purifier") {
-          cursor += 30;
           return (
-            <g key={id} data-testid="scene-item-purifier">
+            <g
+              key={id}
+              className="animate-drop-in"
+              data-testid="scene-item-purifier"
+            >
               <rect
                 x={x - 11}
                 y={floor - 46}
@@ -161,9 +153,12 @@ export function FloorItems({
             </g>
           );
         }
-        cursor += 34;
         return (
-          <g key={id} data-testid="scene-item-dehumidifier">
+          <g
+            key={id}
+            className="animate-drop-in"
+            data-testid="scene-item-dehumidifier"
+          >
             <rect
               x={x - 13}
               y={floor - 40}
