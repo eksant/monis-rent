@@ -137,6 +137,30 @@ test("mobile shows a sticky price bar that opens the summary", async ({
   ).toBeVisible();
 });
 
+test("search finds items across categories", async ({ page }) => {
+  const search = page.getByTestId("catalog-search");
+  await search.fill("webcam");
+  await expect(page.getByRole("tab", { name: "Desk" })).toBeHidden();
+  await addFromCard(page, "webcam");
+  await expect(page.getByTestId("item-card-webcam")).toHaveAttribute(
+    "data-selected",
+    "true",
+  );
+  await expect(page.getByTestId("scene-item-webcam")).toBeVisible();
+  await search.fill("xyzzy");
+  await expect(page.getByText("No match for “xyzzy”")).toBeVisible();
+  await page.getByRole("button", { name: "lamp", exact: true }).click();
+  await expect(page.getByTestId("item-card-lamp-led")).toBeVisible();
+  await search.press("Escape");
+  await expect(page.getByRole("tab", { name: "Desk" })).toBeVisible();
+});
+
+test("slash focuses the search on desktop", async ({ page, isMobile }) => {
+  test.skip(isMobile, "keyboard shortcut is desktop only");
+  await page.keyboard.press("/");
+  await expect(page.getByTestId("catalog-search")).toBeFocused();
+});
+
 test("the builder has no serious accessibility violations", async ({
   page,
 }) => {

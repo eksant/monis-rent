@@ -70,4 +70,12 @@ describe("setup store", () => {
     store.remove("power-strip-3");
     expect(useSetupStore.getState().setup.items).toEqual({});
   });
+
+  it("keeps a search query and clears it when a category is opened", () => {
+    const store = useSetupStore.getState();
+    store.setSearch("webcam");
+    expect(useSetupStore.getState().search).toBe("webcam");
+    store.showCategory("screen");
+    expect(useSetupStore.getState().search).toBe("");
+  });
 });
