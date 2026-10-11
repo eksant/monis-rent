@@ -1,14 +1,16 @@
-// Temporary landing page until the builder lands (milestone 3).
+import { WorkspaceScene } from "@/components/scene/workspace-scene";
+import { defaultSetup } from "@/data/presets";
+
+// Interim page: shows the scene for the default setup until the builder UI lands.
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-3 px-4">
-      <p className="text-sm font-semibold text-accent-foreground">monis.rent</p>
-      <h1 className="text-4xl font-extrabold tracking-tight">
+    <main className="mx-auto w-full max-w-3xl px-4 py-8">
+      <h1 className="mb-4 text-3xl font-extrabold tracking-tight">
         Design your Bali workspace
       </h1>
-      <p className="text-muted-foreground">
-        The workspace builder is on its way. Check back soon.
-      </p>
+      <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
+        <WorkspaceScene setup={defaultSetup()} />
+      </div>
     </main>
   );
 }
