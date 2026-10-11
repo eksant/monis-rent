@@ -47,6 +47,12 @@ user action ─▶ store action ─▶ lib/setup rule ─▶ { setup, notice? }
 
 `d` desk, `c` chair (`none` for no chair), `i` items (`id` or `id:qty`), `p=m` monthly, `pos=stand` standing. Defaults are omitted.
 
+## Layout
+
+- App shell: `h-dvh` with the header and preset bar on top; the page itself never scrolls. Only the item list and the summary list have their own scroll areas.
+- Below `lg`: scene on top (8:5, at most 34% of the screen height), picker below, price bar pinned to the bottom with the summary in a drawer. From `lg`: picker | scene | summary.
+- The scene box uses CSS container units (`w-[min(100cqw,160cqh)]`) so it keeps its ratio inside any space, and the "+" hotspot overlay stays aligned.
+
 ## Scene
 
 - One SVG `viewBox` of 400 × 250 where 1 unit = 1 cm, so desk widths are true to scale.
