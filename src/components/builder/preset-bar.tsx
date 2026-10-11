@@ -17,7 +17,7 @@ export function PresetBar() {
       aria-label="Start from a preset"
       className="mx-auto w-full max-w-[1600px] shrink-0"
     >
-      <ul className="flex snap-x gap-2 overflow-x-auto px-3 py-2 sm:px-4 [&::-webkit-scrollbar]:hidden">
+      <ul className="flex snap-x gap-2 overflow-x-auto px-3 py-2 sm:px-4 short:py-1 [&::-webkit-scrollbar]:hidden">
         {PRESETS.map((preset) => (
           <li key={preset.id} className="snap-start">
             <button

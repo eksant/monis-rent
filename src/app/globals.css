@@ -2,6 +2,9 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Landscape phones: too short for the stacked layout. */
+@custom-variant short (@media (max-height: 520px) and (orientation: landscape));
+
 @theme inline {
   --font-sans: var(--font-inter);
   --font-heading: var(--font-inter);

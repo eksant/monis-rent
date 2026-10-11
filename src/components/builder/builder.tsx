@@ -12,14 +12,14 @@ import { SummaryPanel } from "@/components/builder/summary-panel";
 import { WorkspaceScene } from "@/components/scene/workspace-scene";
 import { useSetupStore } from "@/store/setup-store";
 
-// Below lg: scene on top, picker fills the rest, price bar pinned to the bottom.
-// From lg: picker | scene | summary. The page itself never scrolls.
+// Below lg: scene on top, picker below, price bar pinned to the bottom (landscape
+// phones: scene | picker). From lg: picker | scene | summary. The page never scrolls.
 const GRID =
-  "mx-auto grid min-h-0 w-full max-w-[1600px] flex-1 grid-rows-[auto_minmax(0,1fr)] gap-3 px-3 pb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:px-4 lg:grid-cols-[300px_minmax(0,1fr)_260px] lg:grid-rows-1 lg:gap-4 lg:pb-4 xl:grid-cols-[340px_minmax(0,1fr)_300px]";
+  "mx-auto grid min-h-0 w-full max-w-[1600px] flex-1 grid-rows-[auto_minmax(0,1fr)] gap-3 px-3 pb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:px-4 short:pb-[calc(4rem+env(safe-area-inset-bottom))] short:grid-cols-2 short:grid-rows-1 lg:grid-cols-[300px_minmax(0,1fr)_260px] lg:grid-rows-1 lg:gap-4 lg:pb-4 xl:grid-cols-[340px_minmax(0,1fr)_300px]";
 
 // The scene keeps its 8:5 ratio and fits inside whatever box it gets.
 const SCENE_BOX =
-  "flex h-[min(56vw,34dvh)] min-h-0 items-center justify-center [container-type:size] lg:h-auto lg:flex-1";
+  "flex h-[min(56vw,34dvh)] min-h-0 items-center justify-center [container-type:size] short:h-auto short:flex-1 lg:h-auto lg:flex-1";
 
 function BuilderSkeleton() {
   return (

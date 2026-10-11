@@ -7,7 +7,7 @@ import { ItemCard } from "@/components/builder/item-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { itemsInCategory } from "@/data/catalog";
 import { searchCatalog } from "@/lib/search";
-import { deltaCents, quantityOf, slotCapacity } from "@/lib/setup";
+import { deltaCents, isMultiUnit, quantityOf } from "@/lib/setup";
 import type { CatalogItem, CategoryId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useSetupStore } from "@/store/setup-store";
@@ -64,18 +64,14 @@ function ItemGroups({ groups }: { groups: Group[] }) {
           {heading}
         </h3>
       )}
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 short:grid-cols-1">
         {entries.map((entry) => (
           <ItemCard
             key={entry.id}
             item={entry}
             plan={setup.plan}
             qty={quantityOf(setup, entry.id)}
-            multi={
-              entry.category !== "desk" &&
-              entry.category !== "chair" &&
-              slotCapacity(setup, entry.slot) > 1
-            }
+            multi={isMultiUnit(setup, entry.id)}
             delta={deltaCents(setup, entry.id)}
             onToggle={() => {
               toggle(entry.id);

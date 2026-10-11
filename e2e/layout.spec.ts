@@ -8,6 +8,8 @@ const SIZES = [
   { width: 1280, height: 720 },
   { width: 1440, height: 900 },
   { width: 1920, height: 1080 },
+  { width: 844, height: 390 },
+  { width: 667, height: 375 },
 ];
 
 test("the builder fits every viewport without page scroll", async ({
@@ -33,5 +35,43 @@ test("the builder fits every viewport without page scroll", async ({
       label,
     ).toBeInViewport();
     await expect(page.getByTestId("catalog-search"), label).toBeInViewport();
+    await expect(
+      page.locator('[data-testid^="item-card-"]').first(),
+      label,
+    ).toBeInViewport({ ratio: 0.5 });
   }
+});
+
+test("touch targets are at least 32 px on phones", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile, "phone only");
+  await page.goto("/");
+  await expect(page.getByTestId("workspace-scene")).toBeVisible();
+  await page.getByRole("tab", { name: "Screens" }).click();
+  await page
+    .getByTestId("item-card-mon-24-1c")
+    .getByRole("button")
+    .first()
+    .click();
+  const targets = [
+    page.getByRole("button", { name: /^Add another/ }).first(),
+    page.getByRole("button", { name: /^Remove one/ }).first(),
+    page.getByRole("link", { name: "View on monis.rent" }).first(),
+    page.getByTestId("share-button"),
+  ];
+  for (const target of targets) {
+    const box = await target.boundingBox();
+    expect(box?.height ?? 0).toBeGreaterThanOrEqual(32);
+    expect(box?.width ?? 0).toBeGreaterThanOrEqual(32);
+  }
+  await page.getByTestId("price-bar").click();
+  const remove = page
+    .getByTestId("summary-panel")
+    .filter({ visible: true })
+    .getByRole("button", { name: /^Remove/ })
+    .first();
+  const box = await remove.boundingBox();
+  expect(box?.height ?? 0).toBeGreaterThanOrEqual(32);
 });
