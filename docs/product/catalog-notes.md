@@ -11,7 +11,7 @@
 ## Pricing rules
 
 - Prices are USD list prices per week and per month, stored as integer cents.
-- `sale` is a discount percentage: effective price = list × (100 − sale) / 100, rounded to the cent. Example: the desk lamp at $4.00 with `sale` 20 costs $3.20, which matches the site's "from $3/week".
+- `sale` is a discount percentage: effective price = list × (100 − sale) / 100, rounded to the cent. Example: the desk lamp at $4.00 with `sale` 20 costs $3.20, consistent with the site's "from $3/week" (the site rounds down).
 - Monthly savings shown in the UI = weekly total × 52 / 12 − monthly total.
 - Delivery fees are calculated by monis.rent at checkout from location and weight; this app never computes or promises them.
 - "Can arrive today" means every item has `enable_instant`; otherwise "Arrives tomorrow" (monis.rent's standard next-day delivery).

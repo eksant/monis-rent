@@ -19,6 +19,7 @@ next-env.d.ts
 .vercel
 
 # misc
+.claude/settings.local.json
 .DS_Store
 *.pem
 npm-debug.log*

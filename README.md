@@ -36,4 +36,4 @@ Next.js 16 (App Router, TypeScript), Tailwind CSS 4, shadcn/ui, Zustand, Vitest,
 
 ## License
 
-Code: [MIT](LICENSE). Product names, prices and photos belong to monis.rent and are used here for the challenge only.
+The code is [MIT](LICENSE)-licensed. The MIT grant does not cover monis.rent product names, prices or photos (in `src/data/catalog.ts` and on `strapi.monis.rent`); they belong to monis.rent and are used here for the challenge only.

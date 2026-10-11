@@ -1,7 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
 // Runs against a local production server, or against BASE_URL (e.g. a Vercel deployment).
-const baseURL = process.env.BASE_URL ?? "http://localhost:3000";
+const LOCAL_URL = "http://localhost:3000";
+const remote = process.env.BASE_URL;
+const baseURL = remote !== undefined && remote !== "" ? remote : LOCAL_URL;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -18,12 +20,13 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
     { name: "mobile", use: { ...devices["Pixel 7"] } },
   ],
-  webServer: process.env.BASE_URL
-    ? undefined
-    : {
-        command: "pnpm start",
-        url: baseURL,
-        reuseExistingServer: false,
-        timeout: 120_000,
-      },
+  webServer:
+    baseURL === LOCAL_URL
+      ? {
+          command: "pnpm start",
+          url: LOCAL_URL,
+          reuseExistingServer: false,
+          timeout: 120_000,
+        }
+      : undefined,
 });
