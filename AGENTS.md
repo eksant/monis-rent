@@ -26,24 +26,24 @@ Next.js 16 (App Router, TypeScript strict), Tailwind CSS 4, shadcn/ui (Radix bas
 
 ## Commands
 
-| Command                        | What it does                                               |
-| ------------------------------ | ---------------------------------------------------------- |
-| `pnpm install`                 | Install dependencies (pnpm only; npm and yarn are blocked) |
-| `pnpm dev`                     | Dev server on http://localhost:3000                        |
-| `pnpm lint`                    | ESLint, strict type-checked rules, zero warnings allowed   |
-| `pnpm type-check`              | Generate Next route types, then `tsc --noEmit`             |
-| `pnpm format:check`            | Prettier check (`pnpm format` to fix)                      |
-| `pnpm test`                    | Vitest unit tests (`src/**/*.test.ts`)                     |
-| `pnpm build`                   | Production build                                           |
-| `pnpm test:e2e`                | Playwright against `pnpm start` (run `pnpm build` first)   |
-| `BASE_URL=<url> pnpm test:e2e` | Playwright against a deployed URL (no local server)        |
+| Command                        | What it does                                                         |
+| ------------------------------ | -------------------------------------------------------------------- |
+| `pnpm install`                 | Install dependencies (pnpm only; npm and yarn are blocked)           |
+| `pnpm dev`                     | Dev server on http://localhost:3000                                  |
+| `pnpm lint`                    | ESLint, strict type-checked rules, zero warnings allowed             |
+| `pnpm type-check`              | Generate Next route types, then `tsc --noEmit`                       |
+| `pnpm format:check`            | Prettier check (`pnpm format` to fix)                                |
+| `pnpm test`                    | Vitest unit tests (`src/**/*.test.ts`)                               |
+| `pnpm build`                   | Production build                                                     |
+| `pnpm test:e2e`                | Playwright against `pnpm start --port 3100` (run `pnpm build` first) |
+| `BASE_URL=<url> pnpm test:e2e` | Playwright against a deployed URL (no local server)                  |
 
 ## Code layout
 
 ```
 src/app/              routes: / (builder), /checkout
 src/data/             catalog snapshot and presets (pure data + lookups)
-src/lib/              pure logic: money, pricing, setup rules, share URL, scene layout
+src/lib/              pure logic: money, pricing, setup rules, share URL, search, scene layout
 src/store/            Zustand store: a thin wrapper over src/lib/setup.ts
 src/components/ui/    vendored shadcn/ui primitives
 src/components/scene/ SVG scene (1 unit = 1 cm)

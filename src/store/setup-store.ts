@@ -37,6 +37,7 @@ export interface SetupState {
   hydrated: boolean;
   activeCategory: CategoryId;
   notice: StoreNotice | null;
+  search: string;
   hydrate: () => Promise<void>;
   applyPreset: (id: PresetId) => void;
   startEmpty: () => void;
@@ -48,6 +49,7 @@ export interface SetupState {
   choosePlan: (plan: Plan) => void;
   choosePosture: (posture: Posture) => void;
   showCategory: (category: CategoryId) => void;
+  setSearch: (query: string) => void;
 }
 
 let noticeSeq = 0;
@@ -95,6 +97,7 @@ export const useSetupStore = create<SetupState>()(
         hydrated: false,
         activeCategory: "desk",
         notice: null,
+        search: "",
         hydrate: async () => {
           if (get().hydrated) return;
           const shared = decodeSetup(window.location.search);
@@ -145,8 +148,12 @@ export const useSetupStore = create<SetupState>()(
         choosePosture: (posture) => {
           apply(setPosture(get().setup, posture));
         },
+        // Opening a category (tab or "+" hotspot) leaves search mode.
         showCategory: (category) => {
-          set({ activeCategory: category });
+          set({ activeCategory: category, search: "" });
+        },
+        setSearch: (query) => {
+          set({ search: query });
         },
       };
     },

@@ -6486,3 +6486,17 @@ Expected: `HTTP/2 200` and `21 passed, 1 skipped`. (If the preview is protected 
 - [ ] **Step 5: Stop for the owner's UX review**
 
 Send the owner the preview URL and the screenshots from Task 11 Step 5, and ask them to review spec §7 on it. Do **not** merge PR C or start Plan 2 until they answer. Their feedback becomes the input for Plan 2 (milestones 4–8).
+
+---
+
+## Changes made during execution
+
+Recorded after execution on 2026-10-11, so the plan matches what shipped.
+
+- **Scaffold review fixes** (Task 3, commit "fix: address scaffold review findings"): exact versions for the shadcn-added dependencies; `npx only-allow@1.2.2`; the Inter variable renamed to `--font-inter` (the theme had `--font-sans: var(--font-sans)`); a read-only `GITHUB_TOKEN` in CI; an empty `BASE_URL` treated as unset; `.claude/settings.local.json` ignored; the README states that MIT does not cover monis.rent data.
+- **Owner review on localhost** (between Tasks 11 and 12), see `docs/qa/2026-10-11-milestone-3.md`:
+  - Catalog search: `src/lib/search.ts` (+ tests), store `search` / `setSearch` (cleared by `showCategory`), `src/components/builder/catalog-search.tsx`, the shadcn `input` component, and search mode in `category-picker.tsx`.
+  - App-shell layout: the page never scrolls; only the item list and the summary list scroll. Mobile-first sizing, sit/stand floats over the scene, larger touch targets. New `e2e/layout.spec.ts` checks seven viewport sizes.
+  - Playwright serves the production build on port 3100 so `pnpm dev` can keep port 3000.
+- **Code review round** (`docs/qa/2026-10-11-code-review.md`): ten findings (CR-01…CR-10) fixed with tests, including `isMultiUnit()`, a route error boundary, accessible item cards, a mobile live region, 32 px touch targets, landscape layout and image fallbacks.
+- **Totals after execution:** 102 unit tests; 35 E2E passes and 5 by-design skips.

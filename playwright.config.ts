@@ -1,7 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Runs against a local production server, or against BASE_URL (e.g. a Vercel deployment).
-const LOCAL_URL = "http://localhost:3000";
+// Runs against a local production server on :3100 (so `pnpm dev` on :3000 can keep running),
+// or against BASE_URL (e.g. a Vercel deployment).
+const LOCAL_URL = "http://localhost:3100";
 const remote = process.env.BASE_URL;
 const baseURL = remote !== undefined && remote !== "" ? remote : LOCAL_URL;
 
@@ -23,7 +24,7 @@ export default defineConfig({
   webServer:
     baseURL === LOCAL_URL
       ? {
-          command: "pnpm start",
+          command: "pnpm start --port 3100",
           url: LOCAL_URL,
           reuseExistingServer: false,
           timeout: 120_000,

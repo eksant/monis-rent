@@ -1,7 +1,7 @@
 # Workspace Builder for monis.rent: Design
 
 - **Date:** 2026-10-11
-- **Status:** Draft, awaiting owner review. Section 7 (UX and flows) is **provisional** and will be reviewed on the first clickable build.
+- **Status:** Approved. Section 7 (UX and flows) was reviewed by the owner on the first clickable build (localhost, 2026-10-11) and updated with the outcome.
 - **Context:** Desent Solutions developer challenge, built for their client monis.rent.
 
 ## 1. Context
@@ -180,49 +180,62 @@ e2e/                           # Playwright specs
   - Items enter with a spring drop, swaps cross-fade, and price numbers tween.
   - With `prefers-reduced-motion`, everything switches instantly.
 
-## 7. UX and flows (provisional)
+## 7. UX and flows
 
-> This section is provisional. It will be reviewed with the owner on the first clickable build (milestone 3 in §14) before polishing.
+> Reviewed with the owner on the clickable build (milestone 3, 2026-10-11). Outcome: catalog search, an app-shell layout where the page never scrolls, mobile-first sizing, and a two-position close-up view (planned for milestone 4).
 
-### 7.1 Builder (`/`) on desktop
+### 7.1 Layout principles
+
+- **App shell:** the header stays in place and the page itself never scrolls, on any screen from 375×667 up. Only the item list and the summary's item list scroll.
+- **Mobile first:** below `lg` (1024 px) the scene sits on top, the picker fills the rest, and a price bar is pinned to the bottom. From `lg` the layout has three columns.
+- **Touch targets** are at least 32 px (36 px for steppers, 44 px for Rent).
+
+### 7.2 Builder (`/`) on desktop (≥ 1024 px)
 
 The sketches show the Founders preset.
 
 ```
-┌ monis.rent · Workspace Builder ─────────────────────── [Share] ┐
-│ [Essentials] [Founders] [Trading] [Studio] [Start empty]        │
-│ ✦ [ Tell us how you work… "Video editor, 2 months in Canggu" ] │
-├─────────────┬──────────────────────────────┬───────────────────┤
-│ Desk        │   window: Bali view           │ Your setup        │
-│ Chair       │   monitors · lamp · plant     │ · items (×)       │
-│ Screens     │   ═══════ desk ═══════        │ [Weekly|Monthly]  │
-│ Accessories │        chair                  │ $47.45 / week     │
-│ Bali extras │   [Sit | Stand]   (+) slots   │ Arrives tomorrow  │
-│ item cards  │                               │ [ Rent this → ]   │
-└─────────────┴──────────────────────────────┴───────────────────┘
+┌ monis.rent │ Design your Bali workspace ────────────────── [Share setup] ┐
+│ [Essentials] [Founders] [Trading] [Studio] [Start empty]                 │
+├──────────────────┬───────────────────────────────┬──────────────────────┤
+│ 🔍 Search …   /  │   window: Bali view            │ Your setup           │
+│ Desk Chair …     │   monitors · lamp · plant      │ · items (×)  ↕ scroll │
+│ item cards       │   ═══════ desk ═══════         │──────────────────────│
+│   ↕ scroll       │        chair      [Sit|Stand]  │ [Weekly|Monthly]     │
+│                  │                                │ $47.45 / week        │
+│                  │                                │ Arrives tomorrow     │
+│                  │                                │ [ Rent this setup ]  │
+└──────────────────┴───────────────────────────────┴──────────────────────┘
 ```
 
-### 7.2 Builder on a phone
+Column widths: 300 / flexible / 260 px at `lg`, 340 / flexible / 300 px at `xl`. The scene keeps its 8:5 ratio and fits the space it gets.
+
+### 7.3 Builder on phones and tablets (< 1024 px)
 
 ```
-header · [Share]
-preset chips (scroll-x) · [✦ Describe]
-PREVIEW (~45vh)
-category tabs (scroll-x)
-item cards (scroll-x)
-sticky bar: $47.45/wk · Weekly ▾ · [Rent →]   (tap opens summary Drawer)
+monis.rent  Design your Bali workspace   [⇪]
+[Essentials][Founders][Trading]…  (scroll-x)
+┌ SCENE (8:5, ≤ 34% of the screen height) ┐
+│                         [Sit|Stand]     │
+└─────────────────────────────────────────┘
+🔍 Search desks, screens, gear…
+[Desk][Chair][Screens][Accessories][Bali]
+item cards (1 column; 2 on tablets)  ↕ scroll
+▬ $47.45 / week · 9 items · Arrives tomorrow ⌃   [Rent]   ← pinned; tap opens the summary drawer
 ```
 
-### 7.3 Interactions
+### 7.4 Interactions
 
-- **Tapping an item in the scene** highlights it and opens its category in the picker.
-- **(+) hotspots** sit on empty slots: monitor slots, desk lamp, plant, under-desk.
-- **Tapping an item card** toggles it: add, or remove when already added. In a slot with capacity 1 it swaps.
-- **When a limit is reached**, a friendly notice with an action appears. Example: "Your 120 cm desk fits 2 monitors. **Upgrade to the 160 cm desk**".
+- **Search** sits above the tabs and searches every category: prefix matches on names, benefits, tags and groups, a few synonyms (screen/display/monitor, wifi/internet, light/lamp, computer/mac, coffee/espresso) and plurals. Whole-word and name matches rank first. Results replace the tabs, grouped by category, with a count. No results shows suggestion chips. `/` focuses the search on desktop; Esc, the × button or opening a category clears it.
+- **Close-up view (milestone 4):** a two-position toggle switches the scene between the whole room and a close-up of the desk, with a smooth transition. Tapping an item in the scene opens its category and switches to the close-up. No free zoom or pan.
+- **Tapping an item in the scene** highlights it and opens its category in the picker (milestone 4).
+- **(+) hotspots** sit on empty slots: monitor slots, desk lamp, plant.
+- **Tapping an item card** toggles it: add, or remove when already added. In a slot with capacity 1 it swaps. Multi-unit items (monitors, plants) show a − / + stepper.
+- **When a limit is reached**, a friendly notice with an action appears. Example: "Your 120 cm desk has no room for another screen. **Upgrade to the 160 cm desk**" (switches the desk and adds the screen).
 - **Item cards show:**
   - the monis.rent photo and the name;
   - one benefit line;
-  - the price as a delta ("+$4.90/wk", or "−$2.00/wk" when swapping);
+  - the effective price for the plan, and the price change as a delta ("+$4.90", or "−$2.00" when swapping);
   - badges: sale % (e.g. −30%), "Same-day", "Concept";
   - a "View on monis.rent" link for real items.
 - **Summary and price bar:**
@@ -231,7 +244,7 @@ sticky bar: $47.45/wk · Weekly ▾ · [Rent →]   (tap opens summary Drawer)
   - Arrival line ("Can arrive today" / "Arrives tomorrow") and "Delivery fee calculated at checkout".
 - **Share** copies the setup URL and shows a toast.
 
-### 7.4 Smart setup
+### 7.5 Smart setup
 
 1. The user types a sentence or taps an example chip, e.g. "Full-stack dev, 6 weeks, $50/wk", "Lots of calls, bad wifi", "Video editor in Canggu, 2 months".
 2. A short staged animation runs (about 0.8 s): "Reading your brief… Picking a desk… Fitting monitors…".
@@ -241,7 +254,7 @@ sticky bar: $47.45/wk · Weekly ▾ · [Rent →]   (tap opens summary Drawer)
 
 Unrecognised input falls back to Essentials with a friendly note. It never dead-ends.
 
-### 7.5 Checkout (`/checkout`)
+### 7.6 Checkout (`/checkout`)
 
 - **Order summary:**
   - Item rows (photo, name, quantity, price for the plan), plan, total, and savings hint.
@@ -255,7 +268,7 @@ Unrecognised input falls back to Essentials with a friendly note. It never dead-
   - "No payment is taken: this is a concept demo."
 - **Missing or invalid stored setup:** redirect to `/`.
 
-### 7.6 Success (`/checkout/success`)
+### 7.7 Success (`/checkout/success`)
 
 - A small celebration animation, a reference such as `MR-7K2Q`, and the order summary.
 - **"What happens next"**, following monis.rent's real flow: confirmation, delivery on the chosen date, the rental starts on arrival, swap or return any time.
@@ -599,8 +612,10 @@ The UI keeps the previous setup for a one-step **Undo**.
 8. On mobile, the sticky bar and summary Drawer work.
 9. A reload keeps the setup.
 10. Axe finds no serious violations on `/` and `/checkout`.
+11. Search finds items across categories, suggests words when empty, and clears with Esc; `/` focuses it on desktop.
+12. At 375×667, 390×844, 820×1180, 1024×768, 1280×720, 1440×900 and 1920×1080 the page does not scroll in either direction, and the header, scene, search and Rent button are on screen.
 
-**Targets:** a local production build (`next build && next start`) in CI, and the deployed URL through `BASE_URL` for a post-deploy smoke run.
+**Targets:** a local production build (`next build && next start --port 3100`, so `pnpm dev` can keep :3000) in CI and locally, and the deployed URL through `BASE_URL` for a post-deploy smoke run.
 
 **Evidence:** the Playwright HTML report and screenshots. Each QA round is summarised in `docs/qa/`.
 
@@ -662,7 +677,7 @@ docs/
 | 1 | Scaffold | Next.js, Tailwind, shadcn, tooling, CI, AGENTS.md and CLAUDE.md, LICENSE, a "hello" page deployed on Vercel |
 | 2 | Core logic | `catalog`, `presets`, `money`, `pricing`, `setup`, `share`, and their unit tests |
 | 3 | **Clickable rough build** | Rough scene, picker, summary and price bar on a preview URL. **Review UX (§7) with the owner here.** |
-| 4 | Polish | Final scene art, animations, posture, hotspots, notices, mobile Drawer |
+| 4 | Polish (incl. close-up view, tap-to-edit) | Final scene art, animations, posture, hotspots, notices, mobile Drawer |
 | 5 | Checkout | `/checkout` and `/checkout/success` |
 | 6 | Smart setup | `suggest` with table tests, then the UI with reasons and Undo |
 | 7 | Quality and docs | E2E suite with axe, `docs/qa` round, README write-up with screenshots, docs |
@@ -670,7 +685,7 @@ docs/
 
 **Cut order if time runs short:** smart setup, then Bali extras, then posture animation. Must-haves M1–M7 are never cut.
 
-**Plans:** milestones 1–3 are planned in `docs/superpowers/plans/2026-10-11-workspace-builder-plan-1-foundation.md`. Milestones 4–8 get a second plan, written after the UX review at milestone 3, because §7 is provisional.
+**Plans:** milestones 1–3 are planned in `docs/superpowers/plans/2026-10-11-workspace-builder-plan-1-foundation.md`. Milestones 4–8 get a second plan, written after the UX review at milestone 3 (done 2026-10-11, see §7).
 
 ## 15. Assumptions and open points
 
@@ -681,4 +696,4 @@ docs/
   - The README notes that monis.rent lists only one chair. This is a product insight for the client.
 - **Bundle discounts:** the -20% bundle pricing is not applied, because the exact rule is unknown. Listed as future work.
 - **Snapshot date:** the catalog was captured on 2026-10-11. Future work: read the catalog live from the monis.rent Strapi API, which uses the same stack.
-- **UX (§7):** provisional until the review at milestone 3.
+- **UX (§7):** reviewed by the owner on 2026-10-11; close-up view and tap-to-edit land in milestone 4.
