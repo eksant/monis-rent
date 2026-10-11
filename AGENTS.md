@@ -50,6 +50,7 @@ src/components/ui/    vendored shadcn/ui primitives
 src/components/scene/ SVG scene (1 unit = 1 cm)
 src/components/builder/ builder UI
 src/components/checkout/ checkout and confirmation UI
+src/components/site-credit.tsx  copyright and "buy me a coffee" line
 e2e/                  Playwright specs
 docs/                 overview, product notes, specs and plans, QA rounds, bug log
 ```

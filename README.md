@@ -13,9 +13,11 @@ Design your Bali workspace visually, see the price instantly, and rent it. Built
 - **Start from a real bundle** (Essentials, Founders, Trading, Studio) or **describe your work** in one sentence ("Video editor in Canggu, 2 months, $120/wk") and get a setup with the reasons behind it, plus Undo.
 - **Swap anything:** 3 desks, 3 chairs, 8 screens, lamps, peripherals, plants and Bali extras (Starlink, dehumidifier, coffee). Search finds items across all categories.
 - **Watch it come to life:** an SVG scene drawn to scale (1 unit = 1 cm). Items drop in, the desk rises when you switch to standing, and screens line up and angle themselves when the desk gets crowded.
-- **Close-up view:** one tap zooms into the desk; drag to look around. Tap the desk, a screen or the chair to jump to its options.
+- **Close-up view:** one tap zooms into the desk; drag to look around.
 - **Always know the price and timing:** weekly or monthly total, monthly savings, and "can arrive today" or "arrives tomorrow" from the monis.rent delivery data.
-- **Share the setup** as a link, then **rent it** through a checkout that ends with a clear confirmation.
+- **Tap anything in the scene** (desk, screens, chair, plants, shelves, fans) to jump to it in the list.
+- **Undo instead of "are you sure?"**: removing an item or switching preset shows a toast with Undo.
+- **Share the setup** as a link, then **rent it** through a checkout with a searchable Bali area list, a calendar and a WhatsApp country code, ending with a clear confirmation.
 
 ## Approach
 
@@ -33,7 +35,7 @@ I started from the persona in the brief: a freelancer who just landed in Bali an
 - **Pure domain core** (`src/lib`): pricing in integer cents, slot and capacity rules, share links, search, smart setup and checkout validation. React only calls it.
 - **Zustand** for state, persisted to `localStorage`. A share link rebuilds any setup.
 - **Smart setup is rule-based** on purpose: no API key, no cost, deterministic and tested. `suggestSetup(text, current)` has the same signature an LLM-backed version would need.
-- **Quality gate:** strict type-checked ESLint (zero warnings), Prettier, 140+ Vitest unit tests, and Playwright E2E on desktop and mobile with axe accessibility checks. A layout test proves the page fits nine screen sizes without scrolling. CI runs all of it on every push.
+- **Quality gate:** strict type-checked ESLint (zero warnings), Prettier, 150+ Vitest unit tests, and Playwright E2E on desktop and mobile with axe accessibility checks. A layout test proves the page fits nine screen sizes without scrolling. CI runs all of it on every push.
 
 ## What I'd improve with more time
 
@@ -65,6 +67,10 @@ pnpm build && pnpm test:e2e     # serves the build on :3100
 - [Architecture](docs/overview/architecture.md) · [Deployment](docs/overview/deployment.md)
 - [Challenge brief and must-haves](docs/product/brief.md) · [Catalog notes](docs/product/catalog-notes.md)
 - [QA rounds](docs/qa/) · [Bug log](docs/bugs/bug-log.md)
+
+## Support
+
+Built by eksant. If this was useful, [buy me a coffee](mailto:eksant@gmail.com?subject=A%20coffee%20for%20the%20monis.rent%20builder).
 
 ## License
 

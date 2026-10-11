@@ -35,7 +35,7 @@ user action ─▶ store action ─▶ lib/setup rule ─▶ { setup, notice? }
 ## State, persistence and sharing
 
 - `Setup` = desk id, chair id or `null`, item quantities, plan (`weekly` | `monthly`) and posture (`sit` | `stand`).
-- The store also holds UI state that is not persisted (active category, search, scene view, one-step undo for smart setup) and the last order, which is persisted with the setup.
+- The store also holds UI state that is not persisted (active category, search, scene view, a focus request that scrolls the list to a tapped item, and a one-step undo used by line removal, preset switches and smart setup) and the last order, which is persisted with the setup.
 - On first load the store hydrates in this order: URL query (shared link), then localStorage (`monis-builder`, version 1), then the Essentials preset.
 - A shared link is cleaned from the address bar after loading. Unknown ids are dropped and reported with a toast.
 - Untrusted input (URL, storage) always passes through `parseSetup` and `normalizeSetup`, so the rules hold for every setup the UI sees.

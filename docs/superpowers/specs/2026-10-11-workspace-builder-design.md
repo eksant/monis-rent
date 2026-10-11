@@ -228,7 +228,7 @@ item cards (1 column; 2 on tablets)  ↕ scroll
 
 - **Search** sits above the tabs and searches every category: prefix matches on names, benefits, tags and groups, a few synonyms (screen/display/monitor, wifi/internet, light/lamp, computer/mac, coffee/espresso) and plurals. Whole-word and name matches rank first. Results replace the tabs, grouped by category, with a count. No results shows suggestion chips. `/` focuses the search on desktop; Esc, the × button or opening a category clears it.
 - **Close-up view (milestone 4):** a two-position toggle switches the scene between the whole room and a close-up of the desk, with a smooth transition. Tapping an item in the scene opens its category and switches to the close-up. In the close-up, dragging (mouse or touch) pans around the scene within its edges; a drag never counts as a tap. There is no free zoom.
-- **Tapping an item in the scene** highlights it and opens its category in the picker (milestone 4).
+- **Tapping an item in the scene** (desk, screens, chair, plants, shelves, climate gear) opens its tab, scrolls the list to its card and flashes it. Desk-level items also switch to the close-up.
 - **(+) hotspots** sit on empty slots: monitor slots, desk lamp, plant.
 - **Tapping an item card** toggles it: add, or remove when already added. In a slot with capacity 1 it swaps. Multi-unit items (monitors, plants) show a − / + stepper.
 - **When a limit is reached**, a friendly notice with an action appears. Example: "Your 120 cm desk has no room for another screen. **Upgrade to the 160 cm desk**" (switches the desk and adds the screen).
@@ -239,6 +239,8 @@ item cards (1 column; 2 on tablets)  ↕ scroll
   - badges: sale % (e.g. −30%), "Same-day", "Concept";
   - a "View on monis.rent" link for real items.
 - **Summary and price bar:**
+  - Items grouped like the tabs; each group folds, shows its count and subtotal, and lists items with dots.
+  - Removing a line (×) removes all of its units and offers **Undo** in a toast; there is no confirmation modal. Switching preset or starting empty from a custom setup also offers Undo.
   - Weekly / Monthly toggle and the total for the chosen plan.
   - When it is positive, the hint "Monthly saves $X vs 4.3 weeks".
   - Arrival line ("Can arrive today" / "Arrives tomorrow") and "Delivery fee calculated at checkout".
@@ -257,12 +259,14 @@ Unrecognised input falls back to Essentials with a friendly note. It never dead-
 ### 7.6 Checkout (`/checkout`)
 
 - **Order summary:**
-  - Item rows (photo, name, quantity, price for the plan), plan, total, and savings hint.
+  - Items grouped like the builder tabs (foldable), plan toggle, total, and savings hint.
   - An "Edit setup" link back to the builder, with state kept.
-- **Form** (react-hook-form and zod):
-  - Full name and email, both required. WhatsApp number, optional.
-  - Delivery area (Canggu, Seminyak, Ubud, Uluwatu, Sanur, Denpasar, Kuta, Other) and address or villa notes.
-  - Delivery date: the earliest allowed date is today when the setup can arrive today, otherwise tomorrow.
+- **Form** (react-hook-form and zod, shadcn components):
+  - Full name and email, both required.
+  - WhatsApp, optional: a searchable country-code picker (Indonesia first, then the countries most nomads come from) plus the national number; stored as "+62 812…" with the local leading 0 dropped.
+  - Delivery area: a searchable list of about 45 Bali areas grouped by region (Canggu & the west coast, Seminyak & Kuta, Bukit, Denpasar & Sanur, Ubud & Gianyar, Tabanan, East, North, Islands, Other).
+  - Delivery date: a calendar in a popover; the earliest day is today when the setup can arrive today, otherwise tomorrow (Bali time), up to 180 days ahead.
+  - Address or villa notes.
 - **Notes shown:**
   - "Delivery fee is calculated by monis.rent based on your location."
   - "No payment is taken: this is a concept demo."
