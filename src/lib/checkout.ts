@@ -1,23 +1,31 @@
 import { z } from "zod";
 
+import { isDeliveryArea } from "@/data/bali-areas";
+import { findDialCode } from "@/data/dial-codes";
 import { totalCents } from "@/lib/pricing";
 import { normalizeSetup, parseSetup, setupLines } from "@/lib/setup";
 import type { Arrival, Setup } from "@/lib/types";
 
-export const DELIVERY_AREAS = [
-  "Canggu",
-  "Seminyak",
-  "Ubud",
-  "Uluwatu",
-  "Sanur",
-  "Denpasar",
-  "Kuta",
-  "Other",
-] as const;
-
 const BALI_TIME_ZONE = "Asia/Makassar";
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
-const WHATSAPP = /^\+?[0-9 ()-]{7,20}$/;
+const PHONE_CHARS = /^[0-9 ().-]+$/;
+
+function phoneDigits(value: string): string {
+  return value.replace(/\D/g, "").replace(/^0+/, "");
+}
+
+// A national number: digits with optional spacing, 6–14 digits without the local 0.
+function isPhoneNumber(value: string): boolean {
+  const digits = phoneDigits(value);
+  return PHONE_CHARS.test(value) && digits.length >= 6 && digits.length <= 14;
+}
+
+function formatWhatsApp(iso: string, number: string): string {
+  const entry = findDialCode(iso);
+  return number === "" || entry === undefined
+    ? ""
+    : `+${entry.dial} ${phoneDigits(number)}`;
+}
 
 // Calendar date in Bali (UTC+8) as YYYY-MM-DD, whatever the visitor's time zone.
 export function baliDate(now: Date): string {
@@ -41,6 +49,17 @@ export function earliestDelivery(arrival: Arrival, now: Date): string {
   return arrival === "today" ? today : addDays(today, 1);
 }
 
+// The date picker works with local Date objects; the form keeps ISO strings.
+export function isoToLocalDate(isoDate: string): Date {
+  const [year = 1970, month = 1, day = 1] = isoDate.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+export function localDateToIso(date: Date): string {
+  const pad = (value: number): string => String(value).padStart(2, "0");
+  return `${String(date.getFullYear())}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 export function formatDeliveryDate(isoDate: string): string {
   return new Intl.DateTimeFormat("en-GB", {
     weekday: "short",
@@ -52,33 +71,43 @@ export function formatDeliveryDate(isoDate: string): string {
 }
 
 export function checkoutSchema(earliest: string) {
-  return z.object({
-    fullName: z.string().trim().min(2, "Please enter your name.").max(80),
-    email: z.string().trim().pipe(z.email("Please enter a valid email.")),
-    whatsapp: z
-      .string()
-      .trim()
-      .refine((value) => value === "" || WHATSAPP.test(value), {
-        message: "Use digits, spaces and an optional +.",
-      }),
-    area: z
-      .string()
-      .pipe(z.enum(DELIVERY_AREAS, { message: "Choose a delivery area." })),
-    address: z
-      .string()
-      .trim()
-      .min(5, "Add a street, villa or landmark.")
-      .max(300),
-    deliveryDate: z
-      .string()
-      .regex(ISO_DATE, "Pick a delivery date.")
-      .refine((value) => !ISO_DATE.test(value) || value >= earliest, {
-        message: `The earliest delivery is ${formatDeliveryDate(earliest)}.`,
-      }),
-  });
+  return z
+    .object({
+      fullName: z.string().trim().min(2, "Please enter your name.").max(80),
+      email: z.string().trim().pipe(z.email("Please enter a valid email.")),
+      whatsappCountry: z
+        .string()
+        .refine((iso) => findDialCode(iso) !== undefined, {
+          message: "Choose a country code.",
+        }),
+      whatsappNumber: z
+        .string()
+        .trim()
+        .refine((value) => value === "" || isPhoneNumber(value), {
+          message: "Use 6–14 digits, without the country code.",
+        }),
+      area: z
+        .string()
+        .refine(isDeliveryArea, { message: "Choose a delivery area." }),
+      address: z
+        .string()
+        .trim()
+        .min(5, "Add a street, villa or landmark.")
+        .max(300),
+      deliveryDate: z
+        .string()
+        .regex(ISO_DATE, "Pick a delivery date.")
+        .refine((value) => !ISO_DATE.test(value) || value >= earliest, {
+          message: `The earliest delivery is ${formatDeliveryDate(earliest)}.`,
+        }),
+    })
+    .transform(({ whatsappCountry, whatsappNumber, ...request }) => ({
+      ...request,
+      whatsapp: formatWhatsApp(whatsappCountry, whatsappNumber),
+    }));
 }
 
-// Form values (input) and validated request (output): `area` starts as "".
+// Form values (input) and the validated request (output, with one `whatsapp` string).
 export type CheckoutValues = z.input<ReturnType<typeof checkoutSchema>>;
 export type CheckoutInput = z.output<ReturnType<typeof checkoutSchema>>;
 
@@ -127,7 +156,7 @@ const storedOrder = z.object({
     fullName: z.string(),
     email: z.string(),
     whatsapp: z.string(),
-    area: z.enum(DELIVERY_AREAS),
+    area: z.string().refine(isDeliveryArea),
     address: z.string(),
     deliveryDate: z.string().regex(ISO_DATE),
   }),

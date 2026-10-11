@@ -65,7 +65,7 @@ docs/                 overview, product notes, specs and plans, QA rounds, bug l
 - **Money** is integer cents. Format only at the edge with `formatCents` / `formatDelta`.
 - **Setup changes** go through `src/lib/setup.ts`, which returns `{ setup, notice? }`. Never mutate a setup in a component.
 - **Catalog honesty:** the catalog is a dated snapshot (`docs/product/catalog-notes.md`). Concept items have no slug and always show a "Concept" badge. Never promise free delivery or a real order.
-- **shadcn/ui:** add components with `pnpm dlx shadcn@4.21.4 add <name>`, then `pnpm lint:fix && pnpm format`. Only the three rules listed in `eslint.config.mjs` are relaxed for `src/components/ui/**`.
+- **shadcn/ui:** add components with `pnpm dlx shadcn@4.21.4 add <name>`, then `pnpm lint:fix && pnpm format`. Only the rules listed in the `src/components/ui/**` block of `eslint.config.mjs` are relaxed there.
 - **Tests:** every behaviour change ships with a test. Unit tests sit next to the code (`*.test.ts`); user flows go in `e2e/`.
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `refactor:`).
 

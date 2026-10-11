@@ -6,17 +6,31 @@ import {
   baliDate,
   type CheckoutInput,
   checkoutSchema,
+  type CheckoutValues,
   createOrder,
   earliestDelivery,
   formatDeliveryDate,
+  isoToLocalDate,
+  localDateToIso,
   orderReference,
   parseOrder,
 } from "@/lib/checkout";
 
+const VALUES = {
+  fullName: "Kadek Ayu",
+  email: "kadek@example.com",
+  whatsappCountry: "ID",
+  whatsappNumber: "0812 3456 7890",
+  area: "Canggu",
+  address: "Villa Melati, Jl. Pantai Berawa 12",
+  deliveryDate: "2026-10-13",
+} satisfies CheckoutValues;
+
+// What the schema turns VALUES into: one WhatsApp string, the local 0 dropped.
 const VALID = {
   fullName: "Kadek Ayu",
   email: "kadek@example.com",
-  whatsapp: "+62 812 3456 7890",
+  whatsapp: "+62 81234567890",
   area: "Canggu",
   address: "Villa Melati, Jl. Pantai Berawa 12",
   deliveryDate: "2026-10-13",
@@ -45,6 +59,14 @@ describe("dates in Bali", () => {
     expect(earliestDelivery("tomorrow", now)).toBe("2026-10-12");
   });
 
+  it("converts between ISO dates and local calendar dates", () => {
+    const date = isoToLocalDate("2026-10-13");
+    expect([date.getFullYear(), date.getMonth(), date.getDate()]).toEqual([
+      2026, 9, 13,
+    ]);
+    expect(localDateToIso(new Date(2026, 0, 5))).toBe("2026-01-05");
+  });
+
   it("formats a delivery date for people", () => {
     expect(formatDeliveryDate("2026-10-13")).toBe("Tue, 13 Oct 2026");
   });
@@ -53,16 +75,35 @@ describe("dates in Bali", () => {
 describe("checkoutSchema", () => {
   const schema = checkoutSchema("2026-10-12");
 
-  it("accepts a complete request and an empty WhatsApp number", () => {
-    expect(schema.safeParse(VALID).success).toBe(true);
-    expect(schema.safeParse({ ...VALID, whatsapp: "" }).success).toBe(true);
+  it("accepts a complete request and joins the WhatsApp number", () => {
+    expect(schema.safeParse(VALUES).data).toEqual(VALID);
+    expect(
+      schema.safeParse({ ...VALUES, whatsappNumber: "" }).data?.whatsapp,
+    ).toBe("");
+    expect(
+      schema.safeParse({
+        ...VALUES,
+        whatsappCountry: "AU",
+        whatsappNumber: "412 345 678",
+      }).data?.whatsapp,
+    ).toBe("+61 412345678");
+  });
+
+  it("accepts any listed Bali area", () => {
+    expect(schema.safeParse({ ...VALUES, area: "Pererenan" }).success).toBe(
+      true,
+    );
+    expect(
+      schema.safeParse({ ...VALUES, area: "Somewhere else in Bali" }).success,
+    ).toBe(true);
   });
 
   it("explains every missing or invalid field", () => {
     const result = schema.safeParse({
       fullName: " ",
       email: "nope",
-      whatsapp: "call me",
+      whatsappCountry: "ZZ",
+      whatsappNumber: "call me",
       area: "",
       address: "x",
       deliveryDate: "",
@@ -72,7 +113,8 @@ describe("checkoutSchema", () => {
     expect(messages).toEqual([
       "Please enter your name.",
       "Please enter a valid email.",
-      "Use digits, spaces and an optional +.",
+      "Choose a country code.",
+      "Use 6–14 digits, without the country code.",
       "Choose a delivery area.",
       "Add a street, villa or landmark.",
       "Pick a delivery date.",
@@ -80,7 +122,7 @@ describe("checkoutSchema", () => {
   });
 
   it("rejects a delivery date before the earliest one", () => {
-    const result = schema.safeParse({ ...VALID, deliveryDate: "2026-10-11" });
+    const result = schema.safeParse({ ...VALUES, deliveryDate: "2026-10-11" });
     expect(result.error?.issues[0]?.message).toBe(
       "The earliest delivery is Mon, 12 Oct 2026.",
     );
@@ -112,7 +154,7 @@ describe("orders", () => {
 
   it("parses a stored order and rejects anything else", () => {
     const order = createOrder(
-      { ...VALID, area: "Ubud" as const },
+      { ...VALID, area: "Ubud" },
       presetSetup("founders"),
       new Date("2026-10-11T02:00:00Z"),
       sequence(0.1),

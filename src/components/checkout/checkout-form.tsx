@@ -3,9 +3,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 import { useSetupSummary } from "@/components/builder/use-setup-summary";
+import {
+  ComboboxField,
+  type ComboboxGroup,
+} from "@/components/checkout/combobox-field";
+import { DateField } from "@/components/checkout/date-field";
+import { SiteCredit } from "@/components/site-credit";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -15,18 +21,34 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { BALI_AREAS } from "@/data/bali-areas";
+import { DIAL_CODES, flagOf } from "@/data/dial-codes";
 import {
   type CheckoutInput,
   checkoutSchema,
   type CheckoutValues,
   createOrder,
-  DELIVERY_AREAS,
   earliestDelivery,
 } from "@/lib/checkout";
 import { useSetupStore } from "@/store/setup-store";
 
-const SELECT =
-  "h-10 w-full rounded-lg border border-input bg-white px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive sm:text-sm";
+const AREA_GROUPS: ComboboxGroup[] = BALI_AREAS.map((group) => ({
+  heading: group.region,
+  options: group.areas.map((area) => ({ value: area, label: area })),
+}));
+
+const COUNTRY_GROUPS: ComboboxGroup[] = [
+  {
+    heading: "Countries",
+    options: DIAL_CODES.map((entry) => ({
+      value: entry.iso,
+      label: `${flagOf(entry.iso)} ${entry.name}`,
+      hint: `+${entry.dial}`,
+    })),
+  },
+];
+
+const TEXT_INPUT = "h-10 bg-white text-base sm:text-sm";
 
 export function CheckoutForm() {
   const router = useRouter();
@@ -39,6 +61,7 @@ export function CheckoutForm() {
   );
   const schema = useMemo(() => checkoutSchema(earliest), [earliest]);
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -48,7 +71,8 @@ export function CheckoutForm() {
     defaultValues: {
       fullName: "",
       email: "",
-      whatsapp: "",
+      whatsappCountry: "ID",
+      whatsappNumber: "",
       area: "",
       address: "",
       deliveryDate: earliest,
@@ -78,7 +102,7 @@ export function CheckoutForm() {
             id="fullName"
             autoComplete="name"
             aria-invalid={errors.fullName !== undefined}
-            className="h-10 text-base sm:text-sm"
+            className={TEXT_INPUT}
             {...register("fullName")}
           />
           <FieldError errors={[errors.fullName]} />
@@ -91,57 +115,92 @@ export function CheckoutForm() {
             inputMode="email"
             autoComplete="email"
             aria-invalid={errors.email !== undefined}
-            className="h-10 text-base sm:text-sm"
+            className={TEXT_INPUT}
             {...register("email")}
           />
           <FieldError errors={[errors.email]} />
         </Field>
-        <Field data-invalid={errors.whatsapp !== undefined}>
-          <FieldLabel htmlFor="whatsapp">
+        <Field data-invalid={errors.whatsappNumber !== undefined}>
+          <FieldLabel htmlFor="whatsappNumber">
             WhatsApp{" "}
             <span className="font-normal text-muted-foreground">
               (optional)
             </span>
           </FieldLabel>
-          <Input
-            id="whatsapp"
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel"
-            placeholder="+62 812 3456 7890"
-            aria-invalid={errors.whatsapp !== undefined}
-            className="h-10 text-base sm:text-sm"
-            {...register("whatsapp")}
+          <div className="flex gap-2">
+            <Controller
+              control={control}
+              name="whatsappCountry"
+              render={({ field }) => (
+                <ComboboxField
+                  id="whatsappCountry"
+                  ariaLabel="Country code"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  groups={COUNTRY_GROUPS}
+                  placeholder="Code"
+                  searchPlaceholder="Search a country…"
+                  emptyText="No country found."
+                  display={(option) =>
+                    `${option.label.split(" ")[0] ?? ""} ${option.hint ?? ""}`
+                  }
+                  className="w-28 shrink-0"
+                />
+              )}
+            />
+            <Input
+              id="whatsappNumber"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel-national"
+              placeholder="812 3456 7890"
+              aria-invalid={errors.whatsappNumber !== undefined}
+              className={TEXT_INPUT}
+              {...register("whatsappNumber")}
+            />
+          </div>
+          <FieldError
+            errors={[errors.whatsappCountry, errors.whatsappNumber]}
           />
-          <FieldError errors={[errors.whatsapp]} />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field data-invalid={errors.area !== undefined}>
             <FieldLabel htmlFor="area">Delivery area</FieldLabel>
-            <select
-              id="area"
-              aria-invalid={errors.area !== undefined}
-              className={SELECT}
-              {...register("area")}
-            >
-              <option value="">Choose an area</option>
-              {DELIVERY_AREAS.map((area) => (
-                <option key={area} value={area}>
-                  {area}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="area"
+              render={({ field }) => (
+                <ComboboxField
+                  id="area"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  groups={AREA_GROUPS}
+                  placeholder="Choose an area"
+                  searchPlaceholder="Search an area…"
+                  emptyText="No area found. Pick “Somewhere else in Bali”."
+                  invalid={errors.area !== undefined}
+                />
+              )}
+            />
             <FieldError errors={[errors.area]} />
           </Field>
           <Field data-invalid={errors.deliveryDate !== undefined}>
             <FieldLabel htmlFor="deliveryDate">Delivery date</FieldLabel>
-            <Input
-              id="deliveryDate"
-              type="date"
-              min={earliest}
-              aria-invalid={errors.deliveryDate !== undefined}
-              className="h-10 text-base sm:text-sm"
-              {...register("deliveryDate")}
+            <Controller
+              control={control}
+              name="deliveryDate"
+              render={({ field }) => (
+                <DateField
+                  id="deliveryDate"
+                  value={field.value}
+                  min={earliest}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  invalid={errors.deliveryDate !== undefined}
+                />
+              )}
             />
             <FieldError errors={[errors.deliveryDate]} />
           </Field>
@@ -154,7 +213,7 @@ export function CheckoutForm() {
             autoComplete="street-address"
             placeholder="Villa name, street, or a Google Maps link"
             aria-invalid={errors.address !== undefined}
-            className="text-base sm:text-sm"
+            className="bg-white text-base sm:text-sm"
             {...register("address")}
           />
           <FieldError errors={[errors.address]} />
@@ -173,6 +232,7 @@ export function CheckoutForm() {
           No payment is taken: this is a concept demo.
         </p>
       </div>
+      <SiteCredit />
     </form>
   );
 }

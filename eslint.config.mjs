@@ -43,6 +43,9 @@ export default defineConfig([
       eqeqeq: "off",
       "@typescript-eslint/no-unnecessary-condition": "off",
       "@typescript-eslint/prefer-nullish-coalescing": "off",
+      // input-group: clicking the addon focuses the input (a mouse-only nicety).
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/no-noninteractive-element-interactions": "off",
     },
   },
   {

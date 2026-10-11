@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
+import { addDays, baliDate, formatDeliveryDate } from "../src/lib/checkout";
+
 async function goToCheckout(page: Page): Promise<void> {
   await page.goto("/");
   await expect(page.getByTestId("workspace-scene")).toBeVisible();
@@ -14,7 +16,9 @@ async function goToCheckout(page: Page): Promise<void> {
 async function fillValidRequest(page: Page): Promise<void> {
   await page.getByLabel("Full name").fill("Kadek Ayu");
   await page.getByLabel("Email").fill("kadek@example.com");
-  await page.getByLabel("Delivery area").selectOption("Canggu");
+  await page.getByLabel("Delivery area").click();
+  await page.getByPlaceholder("Search an area…").fill("cang");
+  await page.getByRole("option", { name: "Canggu" }).click();
   await page
     .getByLabel("Address or villa")
     .fill("Villa Melati, Jl. Pantai Berawa 12");
@@ -95,4 +99,33 @@ test("checkout pages have no serious accessibility violations", async ({
   // Client navigation updates <title> a moment after the content.
   await expect(page).toHaveTitle(/Request received/);
   expect(await scan()).toEqual([]);
+});
+
+test("area, date and WhatsApp use friendly pickers", async ({ page }) => {
+  await goToCheckout(page);
+  await fillValidRequest(page);
+  await expect(page.getByLabel("Delivery area")).toHaveText(/Canggu/);
+
+  await page.getByLabel("Country code").click();
+  await page.getByPlaceholder("Search a country…").fill("austr");
+  await page.getByRole("option", { name: /Australia/ }).click();
+  await expect(page.getByLabel("Country code")).toHaveText(/\+61/);
+  await page.getByLabel(/WhatsApp/).fill("412 345 678");
+
+  const earliest = addDays(baliDate(new Date()), 1);
+  const target = addDays(earliest, 2);
+  await page.getByLabel("Delivery date").click();
+  const day = page.locator(`[data-day="${target}"] button`);
+  if (!(await day.isVisible())) {
+    await page.getByRole("button", { name: "Go to the Next Month" }).click();
+  }
+  await day.click();
+  await expect(page.getByLabel("Delivery date")).toHaveText(
+    formatDeliveryDate(target),
+  );
+
+  await page.getByRole("button", { name: "Send rental request" }).click();
+  await expect(page.getByTestId("order-delivery")).toContainText(
+    formatDeliveryDate(target),
+  );
 });
