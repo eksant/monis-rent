@@ -42,7 +42,7 @@ export function ChairArt({
   const seatY = floor - 48;
   const backTop = variant === "basic" ? seatY - 40 : seatY - 52;
   return (
-    <g data-testid={`scene-chair-${variant}`}>
+    <g className="animate-drop-in" data-testid={`scene-chair-${variant}`}>
       <g stroke={color.frame} strokeWidth="2.4" strokeLinecap="round">
         <line x1={centerX} y1={floor - 6} x2={centerX - 22} y2={floor - 2} />
         <line x1={centerX} y1={floor - 6} x2={centerX + 22} y2={floor - 2} />

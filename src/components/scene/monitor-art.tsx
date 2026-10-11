@@ -31,7 +31,10 @@ export function MonitorArt({
   const riserTop = deskTopY - (monitor.raised ? MONITOR_RISER : 0);
   const gradientId = `screen-${monitor.key}`;
   return (
-    <g data-testid={`scene-monitor-${monitor.item.id}`}>
+    <g
+      className="animate-drop-in"
+      data-testid={`scene-monitor-${monitor.item.id}`}
+    >
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor={tone.screenTop} />

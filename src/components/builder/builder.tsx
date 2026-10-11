@@ -7,6 +7,8 @@ import { NoticeToasts } from "@/components/builder/notice-toasts";
 import { PostureToggle } from "@/components/builder/posture-toggle";
 import { PresetBar } from "@/components/builder/preset-bar";
 import { PriceBar } from "@/components/builder/price-bar";
+import { SceneViewToggle } from "@/components/builder/scene-view-toggle";
+import { ShareButton } from "@/components/builder/share-button";
 import { SiteHeader } from "@/components/builder/site-header";
 import { SummaryPanel } from "@/components/builder/summary-panel";
 import { WorkspaceScene } from "@/components/scene/workspace-scene";
@@ -36,12 +38,17 @@ export function Builder() {
   const hydrate = useSetupStore((state) => state.hydrate);
   const setup = useSetupStore((state) => state.setup);
   const showCategory = useSetupStore((state) => state.showCategory);
+  const editFromScene = useSetupStore((state) => state.editFromScene);
+  const view = useSetupStore((state) => state.view);
   useEffect(() => {
     void hydrate();
   }, [hydrate]);
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
-      <SiteHeader />
+      <SiteHeader
+        subtitle="Pick a preset, swap anything, see the price, and rent it."
+        action={<ShareButton />}
+      />
       <PresetBar />
       {hydrated ? (
         <main className={GRID}>
@@ -51,7 +58,15 @@ export function Builder() {
           >
             <div className={SCENE_BOX}>
               <div className="relative w-[min(100cqw,160cqh)] overflow-hidden rounded-2xl border bg-white shadow-sm">
-                <WorkspaceScene setup={setup} onHotspot={showCategory} />
+                <WorkspaceScene
+                  setup={setup}
+                  view={view}
+                  onHotspot={showCategory}
+                  onEdit={editFromScene}
+                />
+                <div className="absolute top-2 right-2">
+                  <SceneViewToggle />
+                </div>
                 <div className="absolute right-2 bottom-2">
                   <PostureToggle />
                 </div>

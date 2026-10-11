@@ -34,6 +34,28 @@
   --radius-2xl: calc(var(--radius) * 1.8);
 }
 
+/* Scene items drop in when added (and on first load). */
+@theme {
+  --animate-drop-in: drop-in 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  @keyframes drop-in {
+    from {
+      opacity: 0;
+      transform: translateY(-14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drop-in {
+    animation: none;
+  }
+}
+
 /* monis.rent brand: navy #15252e, blue #63aefd, cream #f9f2ea. Light theme only. */
 :root {
   --background: #f9f2ea;

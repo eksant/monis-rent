@@ -9,7 +9,7 @@ const WHITE = "#F7F8F9";
 function Monstera({ x }: { x: number }) {
   const floor = SCENE.floorY;
   return (
-    <g data-testid="scene-plant-monstera">
+    <g className="animate-drop-in" data-testid="scene-plant-monstera">
       <path
         d={`M${String(x - 9)} ${String(floor - 18)} h18 l-2 18 h-14 Z`}
         fill="#C8754B"
@@ -43,7 +43,7 @@ function Monstera({ x }: { x: number }) {
 function SnakePlant({ x }: { x: number }) {
   const floor = SCENE.floorY;
   return (
-    <g data-testid="scene-plant-snake">
+    <g className="animate-drop-in" data-testid="scene-plant-snake">
       <rect
         x={x - 7}
         y={floor - 14}
@@ -102,6 +102,7 @@ export function FloorItems({
       })}
       {has(setup, "extension-cable") ? (
         <path
+          className="animate-drop-in"
           data-testid="scene-item-extension-cable"
           d={`M${String(right - 30)} ${String(floor - 1.5)} Q${String(right + 20)} ${String(floor + 6)} 396 ${String(floor - 20)}`}
           stroke={DARK}
@@ -184,7 +185,7 @@ export function FloorItems({
         );
       })}
       {internet === null ? null : (
-        <g data-testid={`scene-item-${internet}`}>
+        <g className="animate-drop-in" data-testid={`scene-item-${internet}`}>
           <rect x="22" y="112" width="70" height="3" rx="1.5" fill="#C9A77F" />
           {internet === "router" ? (
             <g>
@@ -216,7 +217,7 @@ export function FloorItems({
         </g>
       )}
       {has(setup, "nespresso") ? (
-        <g data-testid="scene-item-nespresso">
+        <g className="animate-drop-in" data-testid="scene-item-nespresso">
           <rect x="308" y="112" width="70" height="3" rx="1.5" fill="#C9A77F" />
           <rect x="334" y="94" width="16" height="18" rx="3" fill="#D94A3A" />
           <rect x="337" y="106" width="10" height="5" rx="1" fill={DARK} />
@@ -224,7 +225,7 @@ export function FloorItems({
         </g>
       ) : null}
       {has(setup, "walking-pad") ? (
-        <g data-testid="scene-item-walking-pad">
+        <g className="animate-drop-in" data-testid="scene-item-walking-pad">
           <rect
             x={desk.x + desk.width / 2 - 42}
             y={floor - 6}
@@ -245,6 +246,7 @@ export function FloorItems({
       ) : null}
       {has(setup, "power-strip-3") || has(setup, "power-strip-6") ? (
         <rect
+          className="animate-drop-in"
           data-testid="scene-item-power-strip"
           x={right - 52}
           y={floor - 3}

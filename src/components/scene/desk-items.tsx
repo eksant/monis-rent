@@ -36,8 +36,45 @@ export function DeskItems({ setup, desk, monitors }: DeskItemsProps) {
   };
   return (
     <g>
+      {/* In front of the screens so it is never hidden behind them. */}
+      {has(setup, "lamp-hue") ? (
+        <g className="animate-drop-in" data-testid="scene-item-lamp-hue">
+          <defs>
+            <linearGradient id="hue" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#FF8FB1" />
+              <stop offset="0.5" stopColor="#B98CFF" />
+              <stop offset="1" stopColor="#63AEFD" />
+            </linearGradient>
+          </defs>
+          <ellipse
+            cx={right - 8}
+            cy={top - 18}
+            rx="12"
+            ry="22"
+            fill="#B98CFF"
+            opacity="0.22"
+          />
+          <rect
+            x={right - 10}
+            y={top - 36}
+            width="4"
+            height="35"
+            rx="2"
+            fill="url(#hue)"
+          />
+          <rect
+            x={right - 13}
+            y={top - 2}
+            width="10"
+            height="2"
+            rx="1"
+            fill={DARK}
+          />
+        </g>
+      ) : null}
       {has(setup, "light-bar") && middle !== undefined ? (
         <rect
+          className="animate-drop-in"
           data-testid="scene-item-light-bar"
           x={middle.x + middle.width / 2 - 18}
           y={middle.y - 3}
@@ -48,7 +85,7 @@ export function DeskItems({ setup, desk, monitors }: DeskItemsProps) {
         />
       ) : null}
       {has(setup, "webcam") ? (
-        <g data-testid="scene-item-webcam">
+        <g className="animate-drop-in" data-testid="scene-item-webcam">
           <rect
             x={
               camAnchor.x +
@@ -65,6 +102,7 @@ export function DeskItems({ setup, desk, monitors }: DeskItemsProps) {
       ) : null}
       {has(setup, "mac-mini") ? (
         <rect
+          className="animate-drop-in"
           data-testid="scene-item-mac-mini"
           x={right - 40}
           y={top - 4}
@@ -76,6 +114,7 @@ export function DeskItems({ setup, desk, monitors }: DeskItemsProps) {
       ) : null}
       {has(setup, "dock") ? (
         <rect
+          className="animate-drop-in"
           data-testid="scene-item-dock"
           x={laptopX + laptopWidth + 3}
           y={top - 3}
@@ -89,6 +128,7 @@ export function DeskItems({ setup, desk, monitors }: DeskItemsProps) {
         <g data-testid="scene-own-laptop">
           {laptopLift > 0 ? (
             <path
+              className="animate-drop-in"
               data-testid="scene-item-laptop-stand"
               d={`M${String(laptopX + 4)} ${String(top)} L${String(laptopX + 8)} ${String(top - laptopLift)} M${String(laptopX + laptopWidth - 4)} ${String(top)} L${String(laptopX + laptopWidth - 8)} ${String(top - laptopLift)}`}
               stroke="#AEB6BC"
@@ -123,6 +163,7 @@ export function DeskItems({ setup, desk, monitors }: DeskItemsProps) {
       ) : null}
       {keyboardSelected ? (
         <rect
+          className="animate-drop-in"
           data-testid="scene-item-keyboard"
           x={center - 20}
           y={top - 2.6}
@@ -134,6 +175,7 @@ export function DeskItems({ setup, desk, monitors }: DeskItemsProps) {
       ) : null}
       {has(setup, "mouse-pad") ? (
         <rect
+          className="animate-drop-in"
           data-testid="scene-item-mouse-pad"
           x={center + 24}
           y={top - 0.8}
@@ -144,6 +186,7 @@ export function DeskItems({ setup, desk, monitors }: DeskItemsProps) {
       ) : null}
       {mouseSelected ? (
         <ellipse
+          className="animate-drop-in"
           data-testid="scene-item-mouse"
           cx={center + 34}
           cy={top - 2}
@@ -154,6 +197,7 @@ export function DeskItems({ setup, desk, monitors }: DeskItemsProps) {
       ) : null}
       {has(setup, "headphones") ? (
         <path
+          className="animate-drop-in"
           data-testid="scene-item-headphones"
           d={`M${String(right - 10)} ${String(top + 18)} a7 7 0 0 1 14 0`}
           stroke={DARK}
@@ -171,11 +215,10 @@ export function BackDeskItems({
   desk,
 }: Pick<DeskItemsProps, "setup" | "desk">) {
   const top = desk.y;
-  const right = desk.x + desk.width;
   return (
     <g>
       {has(setup, "lamp-led") ? (
-        <g data-testid="scene-item-lamp-led">
+        <g className="animate-drop-in" data-testid="scene-item-lamp-led">
           <ellipse cx={desk.x + 8} cy={top - 1} rx="6" ry="1.6" fill={DARK} />
           <path
             d={`M${String(desk.x + 8)} ${String(top - 1)} L${String(desk.x + 12)} ${String(top - 40)} L${String(desk.x + 30)} ${String(top - 46)}`}
@@ -201,43 +244,10 @@ export function BackDeskItems({
           />
         </g>
       ) : null}
-      {has(setup, "lamp-hue") ? (
-        <g data-testid="scene-item-lamp-hue">
-          <defs>
-            <linearGradient id="hue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#FF8FB1" />
-              <stop offset="0.5" stopColor="#B98CFF" />
-              <stop offset="1" stopColor="#63AEFD" />
-            </linearGradient>
-          </defs>
-          <ellipse
-            cx={right - 8}
-            cy={top - 18}
-            rx="12"
-            ry="22"
-            fill="#B98CFF"
-            opacity="0.22"
-          />
-          <rect
-            x={right - 10}
-            y={top - 36}
-            width="4"
-            height="35"
-            rx="2"
-            fill="url(#hue)"
-          />
-          <rect
-            x={right - 13}
-            y={top - 2}
-            width="10"
-            height="2"
-            rx="1"
-            fill={DARK}
-          />
-        </g>
-      ) : null}
+
       {has(setup, "mic-kit") ? (
         <g
+          className="animate-drop-in"
           data-testid="scene-item-mic-kit"
           stroke={DARK}
           strokeWidth="1.4"

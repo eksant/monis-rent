@@ -33,7 +33,7 @@ export function DeskTop({ item, x, width, topY }: DeskProps) {
   const colors = TOP_COLORS[variant];
   const columnWidth = variant === "dualMotor" ? 7 : 5;
   return (
-    <g data-testid={`scene-desk-${variant}`}>
+    <g className="animate-drop-in" data-testid={`scene-desk-${variant}`}>
       {legXs(x, width).map((legX) => (
         <rect
           key={legX}
