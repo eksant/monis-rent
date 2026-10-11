@@ -139,7 +139,7 @@ export function WorkspaceScene({
           onClick={() => {
             onHotspot?.(hotspot.category);
           }}
-          className="absolute flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-dashed border-primary/40 bg-white/80 text-primary shadow-sm transition hover:scale-110 hover:bg-white focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+          className="absolute flex size-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-dashed border-primary/40 bg-white/80 text-primary shadow-sm transition hover:scale-110 hover:bg-white focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
           style={{
             left: percent(hotspot.x, SCENE.width),
             top: percent(hotspot.y, SCENE.height),

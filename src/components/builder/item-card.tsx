@@ -111,7 +111,7 @@ export function ItemCard({
             type="button"
             onClick={onDecrement}
             aria-label={`Remove one ${item.name}`}
-            className="flex size-7 items-center justify-center rounded-full border hover:bg-muted"
+            className="flex size-9 items-center justify-center rounded-full border hover:bg-muted sm:size-7"
           >
             <Minus className="size-3.5" aria-hidden />
           </button>
@@ -125,7 +125,7 @@ export function ItemCard({
             type="button"
             onClick={onToggle}
             aria-label={`Add another ${item.name}`}
-            className="flex size-7 items-center justify-center rounded-full border hover:bg-muted"
+            className="flex size-9 items-center justify-center rounded-full border hover:bg-muted sm:size-7"
           >
             <Plus className="size-3.5" aria-hidden />
           </button>
@@ -136,7 +136,7 @@ export function ItemCard({
           href={monisProductUrl(item.slug)}
           target="_blank"
           rel="noreferrer"
-          className="mt-1.5 inline-block text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+          className="mt-1 inline-block py-1 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
         >
           View on monis.rent
         </a>

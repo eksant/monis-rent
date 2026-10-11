@@ -10,18 +10,23 @@ import { PriceBar } from "@/components/builder/price-bar";
 import { SiteHeader } from "@/components/builder/site-header";
 import { SummaryPanel } from "@/components/builder/summary-panel";
 import { WorkspaceScene } from "@/components/scene/workspace-scene";
-import type { CategoryId } from "@/lib/types";
 import { useSetupStore } from "@/store/setup-store";
+
+// Below lg: scene on top, picker fills the rest, price bar pinned to the bottom.
+// From lg: picker | scene | summary. The page itself never scrolls.
+const GRID =
+  "mx-auto grid min-h-0 w-full max-w-[1600px] flex-1 grid-rows-[auto_minmax(0,1fr)] gap-3 px-3 pb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:px-4 lg:grid-cols-[300px_minmax(0,1fr)_260px] lg:grid-rows-1 lg:gap-4 lg:pb-4 xl:grid-cols-[340px_minmax(0,1fr)_300px]";
+
+// The scene keeps its 8:5 ratio and fits inside whatever box it gets.
+const SCENE_BOX =
+  "flex h-[min(56vw,34dvh)] min-h-0 items-center justify-center [container-type:size] lg:h-auto lg:flex-1";
 
 function BuilderSkeleton() {
   return (
-    <div
-      className="grid animate-pulse gap-4 lg:grid-cols-[340px_minmax(0,1fr)_300px]"
-      aria-busy="true"
-    >
-      <div className="hidden h-96 rounded-xl bg-muted lg:block" />
-      <div className="aspect-[8/5] rounded-2xl bg-muted" />
-      <div className="hidden h-96 rounded-xl bg-muted lg:block" />
+    <div className={GRID} aria-busy="true">
+      <div className="h-[min(56vw,34dvh)] animate-pulse rounded-2xl bg-muted lg:order-2 lg:h-full" />
+      <div className="animate-pulse rounded-xl bg-muted lg:order-1" />
+      <div className="hidden animate-pulse rounded-2xl bg-muted lg:order-3 lg:block" />
     </div>
   );
 }
@@ -34,56 +39,41 @@ export function Builder() {
   useEffect(() => {
     void hydrate();
   }, [hydrate]);
-  const openCategory = (category: CategoryId): void => {
-    showCategory(category);
-    document
-      .getElementById("picker")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex h-dvh flex-col overflow-hidden">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-28 lg:pb-10">
-        <div className="pt-5">
-          <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-            Design your Bali workspace
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Pick a preset, swap anything, and rent it. Delivered and set up for
-            you.
-          </p>
-        </div>
-        <PresetBar />
-        {hydrated ? (
-          <div className="grid items-start gap-4 lg:grid-cols-[340px_minmax(0,1fr)_300px]">
-            <section
-              aria-label="Choose items"
-              className="order-2 lg:order-1 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto lg:pr-1"
-            >
-              <CategoryPicker />
-            </section>
-            <section
-              aria-label="Preview"
-              className="order-1 space-y-3 lg:sticky lg:top-4 lg:order-2"
-            >
-              <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
-                <WorkspaceScene setup={setup} onHotspot={openCategory} />
+      <PresetBar />
+      {hydrated ? (
+        <main className={GRID}>
+          <section
+            aria-label="Preview"
+            className="flex min-h-0 flex-col lg:order-2"
+          >
+            <div className={SCENE_BOX}>
+              <div className="relative w-[min(100cqw,160cqh)] overflow-hidden rounded-2xl border bg-white shadow-sm">
+                <WorkspaceScene setup={setup} onHotspot={showCategory} />
+                <div className="absolute right-2 bottom-2">
+                  <PostureToggle />
+                </div>
               </div>
-              <div className="flex justify-center">
-                <PostureToggle />
-              </div>
-            </section>
-            <aside
-              aria-label="Summary"
-              className="order-3 hidden rounded-2xl border bg-card p-4 shadow-sm lg:sticky lg:top-4 lg:block"
-            >
-              <SummaryPanel />
-            </aside>
-          </div>
-        ) : (
-          <BuilderSkeleton />
-        )}
-      </main>
+            </div>
+          </section>
+          <section
+            aria-label="Choose items"
+            className="flex min-h-0 flex-col lg:order-1"
+          >
+            <CategoryPicker />
+          </section>
+          <aside
+            aria-label="Summary"
+            className="hidden min-h-0 flex-col rounded-2xl border bg-card p-4 shadow-sm lg:order-3 lg:flex"
+          >
+            <SummaryPanel />
+          </aside>
+        </main>
+      ) : (
+        <BuilderSkeleton />
+      )}
       {hydrated ? <PriceBar /> : null}
       <NoticeToasts />
     </div>

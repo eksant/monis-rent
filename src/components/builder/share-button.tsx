@@ -23,10 +23,12 @@ export function ShareButton() {
       variant="outline"
       size="lg"
       onClick={() => void share()}
+      aria-label="Share setup"
       data-testid="share-button"
+      className="size-10 shrink-0 p-0 sm:h-9 sm:w-auto sm:px-3"
     >
       <Share2 aria-hidden />
-      Share setup
+      <span className="hidden sm:inline">Share setup</span>
     </Button>
   );
 }
