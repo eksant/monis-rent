@@ -75,3 +75,25 @@ test("touch targets are at least 32 px on phones", async ({
   const box = await remove.boundingBox();
   expect(box?.height ?? 0).toBeGreaterThanOrEqual(32);
 });
+
+test("checkout keeps the header and scrolls only its content", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "viewport sizes are set explicitly");
+  for (const size of [SIZES[0], SIZES[4]]) {
+    if (size === undefined) continue;
+    const label = `${String(size.width)}x${String(size.height)}`;
+    await page.setViewportSize(size);
+    await page.goto("/checkout");
+    const submit = page.getByRole("button", { name: "Send rental request" });
+    await expect(submit, label).toBeAttached();
+    const vertical = await page.evaluate(
+      () => document.documentElement.scrollHeight - window.innerHeight,
+    );
+    expect(vertical, label).toBeLessThanOrEqual(0);
+    await submit.scrollIntoViewIfNeeded();
+    await expect(submit, label).toBeInViewport();
+    await expect(page.getByRole("banner"), label).toBeInViewport();
+  }
+});
