@@ -133,10 +133,12 @@ src/
     catalog.ts                 # CatalogItem[] snapshot and concept items
     presets.ts                 # Essentials, Founders, Trading, Studio
   lib/
+    types.ts                   # shared types (CatalogItem, Setup, Notice, …)
     money.ts                   # cents helpers and USD formatting
     pricing.ts                 # effective price, totals, monthly savings, arrival
     setup.ts                   # Setup model and slot rules (pure)
     share.ts                   # Setup <-> URL search params
+    scene-layout.ts            # layoutScene(setup): desk, monitor and hotspot positions (pure)
     suggest.ts                 # suggestSetup(text, current) -> Suggestion (pure, rule-based)
   store/
     setup-store.ts             # Zustand store: thin wrapper over lib/setup, one-step undo
@@ -272,11 +274,14 @@ type SlotId =
   | "computer" | "dock" | "power" | "cable" | "plant"
   | "internet" | "dehumidifier" | "purifier" | "fan" | "coffee" | "underDesk";
 
-// Which scene component draws an item, plus its visual parameters (size, curved, colour…)
-interface ArtSpec {
-  kind: string;  // e.g. "desk", "chair", "monitor", "lamp", "plant", "box"
-  params?: Record<string, string | number | boolean>;
-}
+// Which scene component draws an item; a discriminated union so each kind carries typed parameters.
+type ArtSpec =
+  | { kind: "desk"; variant: "electric" | "mechanical" | "dualMotor" }
+  | { kind: "chair"; variant: "ergo" | "basic" | "premium" }
+  | { kind: "monitor"; inches: number; ultrawide: boolean; tone: "dark" | "silver" }
+  | { kind: "keyboard" | "mouse"; tone: "dark" | "silver" }
+  | { kind: "plant"; variant: "monstera" | "snake" }
+  | { kind: "deskLamp" | "hueLamp" | "lightBar" | /* …one kind per remaining item */ "walkingPad" };
 
 interface CatalogItem {
   id: string;              // stable short id used in URLs, e.g. "desk-electric"
@@ -404,7 +409,7 @@ All presets start with `plan: weekly` and `posture: sit`. "Start empty" keeps `d
 
 ### 9.1 Setup rules (`lib/setup.ts`, pure)
 
-Every mutation returns `{ setup, notice? }`. A notice is a short user-facing message, optionally with an action.
+Every mutation returns `{ setup, notice? }`. A notice is a short user-facing message, optionally with an action `{ label, deskId, addItemId? }`: the "Upgrade desk" action switches the desk and then retries adding the item that did not fit.
 
 **Capacity**
 - **Desk:** exactly one. It can be swapped but never removed.
@@ -664,6 +669,8 @@ docs/
 | 8 | Hand-off | Production check, then invite `desent-bot` (Read) **after the owner confirms** |
 
 **Cut order if time runs short:** smart setup, then Bali extras, then posture animation. Must-haves M1–M7 are never cut.
+
+**Plans:** milestones 1–3 are planned in `docs/superpowers/plans/2026-10-11-workspace-builder-plan-1-foundation.md`. Milestones 4–8 get a second plan, written after the UX review at milestone 3, because §7 is provisional.
 
 ## 15. Assumptions and open points
 
