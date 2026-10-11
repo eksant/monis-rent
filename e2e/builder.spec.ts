@@ -222,6 +222,12 @@ test("the mobile price bar announces total changes", async ({
   await expect(live).toHaveText("$47.45 per week");
 });
 
+test("counts use the singular for one item", async ({ page, isMobile }) => {
+  await page.getByRole("button", { name: "Start empty" }).click();
+  const summary = await openSummary(page, isMobile);
+  await expect(summary).toContainText("1 item ·");
+});
+
 test("the builder has no serious accessibility violations", async ({
   page,
 }) => {

@@ -5,11 +5,13 @@ import Link from "next/link";
 
 import { PlanToggle } from "@/components/builder/plan-toggle";
 import { useSetupSummary } from "@/components/builder/use-setup-summary";
+import { useTweenedNumber } from "@/components/builder/use-tweened-number";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { matchingPresetId, PRESETS } from "@/data/presets";
 import { formatCents } from "@/lib/money";
 import { effectiveCents } from "@/lib/pricing";
+import { countLabel } from "@/lib/text";
 import { useSetupStore } from "@/store/setup-store";
 
 // The item list scrolls; plan, total and the Rent button stay pinned below it.
@@ -18,6 +20,7 @@ export function SummaryPanel() {
   const remove = useSetupStore((state) => state.remove);
   const showCategory = useSetupStore((state) => state.showCategory);
   const { lines, totalCents, savingsCents, arrival } = useSetupSummary();
+  const shownTotal = useTweenedNumber(totalCents);
   const presetName = PRESETS.find(
     (preset) => preset.id === matchingPresetId(setup),
   )?.name;
@@ -31,7 +34,7 @@ export function SummaryPanel() {
       <div className="shrink-0">
         <h2 className="text-base font-semibold">Your setup</h2>
         <p className="text-xs text-muted-foreground">
-          {count} items · {presetName ?? "Custom"}
+          {countLabel(count, "item")} · {presetName ?? "Custom"}
         </p>
       </div>
       <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1 text-sm">
@@ -80,12 +83,17 @@ export function SummaryPanel() {
       </ul>
       <div className="shrink-0 space-y-3 border-t pt-3">
         <PlanToggle />
-        <div aria-live="polite">
+        <div>
+          {/* Screen readers get the final total; the visible one counts up. */}
+          <p className="sr-only" aria-live="polite">
+            {formatCents(totalCents)} per {unit}
+          </p>
           <p
             className="text-2xl font-bold tabular-nums"
             data-testid="summary-total"
+            aria-hidden
           >
-            {formatCents(totalCents)}
+            {formatCents(shownTotal)}
             <span className="text-sm font-normal text-muted-foreground">
               {" "}
               / {unit}

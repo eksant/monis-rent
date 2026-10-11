@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { SummaryPanel } from "@/components/builder/summary-panel";
 import { useSetupSummary } from "@/components/builder/use-setup-summary";
+import { useTweenedNumber } from "@/components/builder/use-tweened-number";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -14,12 +15,14 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { formatCents } from "@/lib/money";
+import { countLabel } from "@/lib/text";
 import { useSetupStore } from "@/store/setup-store";
 
 // Pinned to the bottom below lg; tapping the total opens the full summary.
 export function PriceBar() {
   const plan = useSetupStore((state) => state.setup.plan);
   const { lines, totalCents, arrival } = useSetupSummary();
+  const shownTotal = useTweenedNumber(totalCents);
   const count = lines.reduce((sum, line) => sum + line.qty, 0);
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgb(21_37_46/0.06)] backdrop-blur lg:hidden">
@@ -33,14 +36,14 @@ export function PriceBar() {
             >
               <span className="min-w-0">
                 <span className="block text-lg leading-tight font-bold tabular-nums">
-                  {formatCents(totalCents)}
+                  {formatCents(shownTotal)}
                   <span className="text-xs font-normal text-muted-foreground">
                     {" "}
                     / {plan === "weekly" ? "week" : "month"}
                   </span>
                 </span>
                 <span className="block truncate text-xs text-muted-foreground">
-                  {count} items ·{" "}
+                  {countLabel(count, "item")} ·{" "}
                   {arrival === "today"
                     ? "Can arrive today"
                     : "Arrives tomorrow"}
