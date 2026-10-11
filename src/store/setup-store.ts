@@ -6,6 +6,7 @@ import {
 } from "zustand/middleware";
 
 import { defaultSetup, emptySetup, presetSetup } from "@/data/presets";
+import { type Order, parseOrder } from "@/lib/checkout";
 import {
   addItem,
   normalizeSetup,
@@ -32,12 +33,17 @@ export interface StoreNotice extends Notice {
   id: number;
 }
 
+export type SceneView = "room" | "desk";
+
 export interface SetupState {
   setup: Setup;
   hydrated: boolean;
   activeCategory: CategoryId;
   notice: StoreNotice | null;
   search: string;
+  view: SceneView;
+  lastOrder: Order | null;
+  previousSetup: Setup | null;
   hydrate: () => Promise<void>;
   applyPreset: (id: PresetId) => void;
   startEmpty: () => void;
@@ -50,6 +56,12 @@ export interface SetupState {
   choosePosture: (posture: Posture) => void;
   showCategory: (category: CategoryId) => void;
   setSearch: (query: string) => void;
+  setView: (view: SceneView) => void;
+  editFromScene: (category: CategoryId) => void;
+  placeOrder: (order: Order) => void;
+  startNewSetup: () => void;
+  applySuggestion: (setup: Setup) => void;
+  undoSuggestion: () => void;
 }
 
 let noticeSeq = 0;
@@ -98,6 +110,9 @@ export const useSetupStore = create<SetupState>()(
         activeCategory: "desk",
         notice: null,
         search: "",
+        view: "room",
+        lastOrder: null,
+        previousSetup: null,
         hydrate: async () => {
           if (get().hydrated) return;
           const shared = decodeSetup(window.location.search);
@@ -155,6 +170,38 @@ export const useSetupStore = create<SetupState>()(
         setSearch: (query) => {
           set({ search: query });
         },
+        setView: (view) => {
+          set({ view });
+        },
+        // Smart setup keeps the setup it replaced, for a one-step undo.
+        applySuggestion: (next) => {
+          set({
+            previousSetup: get().setup,
+            setup: next,
+            notice: null,
+            search: "",
+          });
+        },
+        undoSuggestion: () => {
+          const previous = get().previousSetup;
+          if (previous !== null) set({ setup: previous, previousSetup: null });
+        },
+        placeOrder: (order) => {
+          set({ lastOrder: order });
+        },
+        startNewSetup: () => {
+          set({
+            setup: defaultSetup(),
+            view: "room",
+            search: "",
+            activeCategory: "desk",
+            notice: null,
+          });
+        },
+        // Tapping the desk, a screen or the chair in the scene.
+        editFromScene: (category) => {
+          set({ activeCategory: category, search: "", view: "desk" });
+        },
       };
     },
     {
@@ -162,14 +209,19 @@ export const useSetupStore = create<SetupState>()(
       version: 1,
       storage: createJSONStorage(() => safeStorage),
       skipHydration: true,
-      partialize: (state) => ({ setup: state.setup }),
+      partialize: (state) => ({
+        setup: state.setup,
+        lastOrder: state.lastOrder,
+      }),
       merge: (persisted, current) => {
-        const raw = parseSetup(
-          (persisted as { setup?: unknown } | undefined)?.setup,
-        );
-        return raw === null
-          ? current
-          : { ...current, setup: normalizeSetup(raw).setup };
+        const stored = persisted as
+          { setup?: unknown; lastOrder?: unknown } | undefined;
+        const raw = parseSetup(stored?.setup);
+        return {
+          ...current,
+          setup: raw === null ? current.setup : normalizeSetup(raw).setup,
+          lastOrder: parseOrder(stored?.lastOrder),
+        };
       },
       migrate: () => ({ setup: defaultSetup() }),
     },

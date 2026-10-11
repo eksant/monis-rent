@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { defaultSetup, presetSetup } from "@/data/presets";
+import { createOrder } from "@/lib/checkout";
 import { useSetupStore } from "@/store/setup-store";
 
 const initial = useSetupStore.getState();
@@ -77,5 +78,60 @@ describe("setup store", () => {
     expect(useSetupStore.getState().search).toBe("webcam");
     store.showCategory("screen");
     expect(useSetupStore.getState().search).toBe("");
+  });
+
+  it("switches between the room view and the desk close-up", () => {
+    const store = useSetupStore.getState();
+    expect(useSetupStore.getState().view).toBe("room");
+    store.setView("desk");
+    expect(useSetupStore.getState().view).toBe("desk");
+  });
+
+  it("edits from the scene: opens the category in the close-up view", () => {
+    const store = useSetupStore.getState();
+    store.setSearch("lamp");
+    store.editFromScene("chair");
+    const state = useSetupStore.getState();
+    expect(state.activeCategory).toBe("chair");
+    expect(state.view).toBe("desk");
+    expect(state.search).toBe("");
+  });
+
+  it("keeps the last order and starts a new setup after it", () => {
+    const store = useSetupStore.getState();
+    store.applyPreset("founders");
+    const order = createOrder(
+      {
+        fullName: "Kadek Ayu",
+        email: "kadek@example.com",
+        whatsapp: "",
+        area: "Ubud",
+        address: "Villa Melati",
+        deliveryDate: "2026-10-13",
+      },
+      useSetupStore.getState().setup,
+      new Date("2026-10-11T02:00:00Z"),
+    );
+    store.placeOrder(order);
+    expect(useSetupStore.getState().lastOrder).toEqual(order);
+    store.setView("desk");
+    store.startNewSetup();
+    const state = useSetupStore.getState();
+    expect(state.setup).toEqual(presetSetup("essentials"));
+    expect(state.view).toBe("room");
+    expect(state.lastOrder).toEqual(order);
+  });
+
+  it("applies a suggestion and undoes it once", () => {
+    const store = useSetupStore.getState();
+    store.applyPreset("trading");
+    const before = useSetupStore.getState().setup;
+    store.applySuggestion(presetSetup("studio"));
+    expect(useSetupStore.getState().setup).toEqual(presetSetup("studio"));
+    store.undoSuggestion();
+    expect(useSetupStore.getState().setup).toEqual(before);
+    expect(useSetupStore.getState().previousSetup).toBeNull();
+    store.undoSuggestion();
+    expect(useSetupStore.getState().setup).toEqual(before);
   });
 });
