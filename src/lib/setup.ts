@@ -165,6 +165,7 @@ function fullSlotNotice(setup: Setup, entry: CatalogItem): Notice {
   return {
     message: `Your ${String(desk.widthCm)} cm desk has no room for another screen.`,
     action: {
+      kind: "upgradeDesk",
       label: `Upgrade to the ${String(upgrade.widthCm)} cm desk`,
       deskId: upgrade.id,
       addItemId: entry.id,

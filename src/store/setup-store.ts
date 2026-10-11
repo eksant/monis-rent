@@ -5,12 +5,20 @@ import {
   type StateStorage,
 } from "zustand/middleware";
 
-import { defaultSetup, emptySetup, presetSetup } from "@/data/presets";
+import { findItem } from "@/data/catalog";
+import {
+  defaultSetup,
+  emptySetup,
+  matchingPresetId,
+  PRESETS,
+  presetSetup,
+} from "@/data/presets";
 import { type Order, parseOrder } from "@/lib/checkout";
 import {
   addItem,
   normalizeSetup,
   parseSetup,
+  quantityOf,
   removeItem,
   setChair,
   setDesk,
@@ -72,8 +80,11 @@ export interface SetupState {
   placeOrder: (order: Order) => void;
   startNewSetup: () => void;
   applySuggestion: (setup: Setup) => void;
-  undoSuggestion: () => void;
+  removeLine: (id: string) => void;
+  undo: () => void;
 }
+
+const UNDO = { kind: "undo", label: "Undo" } as const;
 
 let noticeSeq = 0;
 function stamp(notice: Notice | undefined): StoreNotice | null {
@@ -115,6 +126,16 @@ export const useSetupStore = create<SetupState>()(
       const apply = (result: SetupResult): void => {
         set({ setup: result.setup, notice: stamp(result.notice) });
       };
+      // Replacing a hand-made setup keeps it for one-step undo.
+      const replaceSetup = (next: Setup, message: string): void => {
+        const current = get().setup;
+        const custom = matchingPresetId(current) === null;
+        set({
+          setup: next,
+          previousSetup: custom ? current : get().previousSetup,
+          notice: custom ? stamp({ message, action: UNDO }) : null,
+        });
+      };
       return {
         setup: defaultSetup(),
         hydrated: false,
@@ -143,16 +164,16 @@ export const useSetupStore = create<SetupState>()(
           set({ hydrated: true });
         },
         applyPreset: (id) => {
-          set({
-            setup: { ...presetSetup(id), plan: get().setup.plan },
-            notice: null,
-          });
+          replaceSetup(
+            { ...presetSetup(id), plan: get().setup.plan },
+            `Switched to ${PRESETS.find((preset) => preset.id === id)?.name ?? "the preset"}.`,
+          );
         },
         startEmpty: () => {
-          set({
-            setup: { ...emptySetup(), plan: get().setup.plan },
-            notice: null,
-          });
+          replaceSetup(
+            { ...emptySetup(), plan: get().setup.plan },
+            "Started from an empty desk.",
+          );
         },
         toggle: (id) => {
           apply(toggleItem(get().setup, id));
@@ -194,9 +215,33 @@ export const useSetupStore = create<SetupState>()(
             search: "",
           });
         },
-        undoSuggestion: () => {
+        removeLine: (id) => {
+          const before = get().setup;
+          let next = before;
+          let cascade: string | undefined;
+          while (id !== next.deskId && quantityOf(next, id) > 0) {
+            const result = removeItem(next, id);
+            if (result.setup === next) break;
+            cascade = result.notice?.message ?? cascade;
+            next = result.setup;
+          }
+          if (next === before) return;
+          const name = findItem(id)?.name ?? "item";
+          set({
+            setup: next,
+            previousSetup: before,
+            notice: stamp({
+              message: [`Removed the ${name}.`, cascade]
+                .filter(Boolean)
+                .join(" "),
+              action: UNDO,
+            }),
+          });
+        },
+        undo: () => {
           const previous = get().previousSetup;
-          if (previous !== null) set({ setup: previous, previousSetup: null });
+          if (previous !== null)
+            set({ setup: previous, previousSetup: null, notice: null });
         },
         placeOrder: (order) => {
           set({ lastOrder: order });

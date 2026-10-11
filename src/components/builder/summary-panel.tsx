@@ -19,7 +19,7 @@ import { useSetupStore } from "@/store/setup-store";
 // The item list scrolls; plan, total and the Rent button stay pinned below it.
 export function SummaryPanel() {
   const setup = useSetupStore((state) => state.setup);
-  const remove = useSetupStore((state) => state.remove);
+  const removeLine = useSetupStore((state) => state.removeLine);
   const showCategory = useSetupStore((state) => state.showCategory);
   const { lines, totalCents, savingsCents, arrival } = useSetupSummary();
   const plan = setup.plan;
@@ -43,7 +43,7 @@ export function SummaryPanel() {
       <GroupedLines
         lines={lines}
         plan={plan}
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1"
+        className="min-h-0 flex-1 scroll-fade overflow-y-auto overscroll-contain pr-1 pb-4"
         renderLine={({ item, qty }) => (
           <li
             key={item.id}
@@ -77,7 +77,7 @@ export function SummaryPanel() {
                 type="button"
                 aria-label={`Remove ${item.name}`}
                 onClick={() => {
-                  remove(item.id);
+                  removeLine(item.id);
                 }}
                 className="-my-1.5 flex size-8 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
               >

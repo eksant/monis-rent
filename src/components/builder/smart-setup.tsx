@@ -29,7 +29,7 @@ const STEP_MS = 270;
 export function SmartSetup() {
   const setup = useSetupStore((state) => state.setup);
   const applySuggestion = useSetupStore((state) => state.applySuggestion);
-  const undoSuggestion = useSetupStore((state) => state.undoSuggestion);
+  const undo = useSetupStore((state) => state.undo);
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [step, setStep] = useState<number | null>(null);
@@ -60,7 +60,7 @@ export function SmartSetup() {
             ))}
           </ul>
         ),
-        action: { label: "Undo", onClick: undoSuggestion },
+        action: { label: "Undo", onClick: undo },
         duration: 10_000,
       });
     };

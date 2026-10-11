@@ -107,12 +107,10 @@ export interface SetupLine {
   qty: number;
 }
 
-// "Upgrade desk" style action: switch desk, then retry adding the item that did not fit.
-export interface NoticeAction {
-  label: string;
-  deskId: string;
-  addItemId?: string;
-}
+// Toast buttons: switch to a wider desk (then retry the item), or undo the last change.
+export type NoticeAction =
+  | { kind: "upgradeDesk"; label: string; deskId: string; addItemId?: string }
+  | { kind: "undo"; label: string };
 
 export interface Notice {
   message: string;

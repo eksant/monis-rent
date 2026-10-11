@@ -128,10 +128,10 @@ describe("setup store", () => {
     const before = useSetupStore.getState().setup;
     store.applySuggestion(presetSetup("studio"));
     expect(useSetupStore.getState().setup).toEqual(presetSetup("studio"));
-    store.undoSuggestion();
+    store.undo();
     expect(useSetupStore.getState().setup).toEqual(before);
     expect(useSetupStore.getState().previousSetup).toBeNull();
-    store.undoSuggestion();
+    store.undo();
     expect(useSetupStore.getState().setup).toEqual(before);
   });
 
@@ -145,6 +145,43 @@ describe("setup store", () => {
     store.editFromScene("extra", "nespresso", false);
     expect(useSetupStore.getState().focusRequest?.seq).toBeGreaterThan(
       first.focusRequest?.seq ?? 0,
+    );
+  });
+
+  it("removes a whole line from the summary and can undo it", () => {
+    const store = useSetupStore.getState();
+    store.applyPreset("founders");
+    store.add("mon-27-4k");
+    const before = useSetupStore.getState().setup;
+    store.removeLine("mon-27-4k");
+    const after = useSetupStore.getState();
+    expect(after.setup.items["mon-27-4k"]).toBeUndefined();
+    // The light bar needs a monitor, so it goes too.
+    expect(after.setup.items["light-bar"]).toBeUndefined();
+    expect(after.notice?.message).toMatch(
+      /^Removed the 27" 4K Multimedia Monitor\./,
+    );
+    expect(after.notice?.action).toEqual({ kind: "undo", label: "Undo" });
+    store.undo();
+    expect(useSetupStore.getState().setup).toEqual(before);
+  });
+
+  it("offers undo when a preset replaces a custom setup, not a preset", () => {
+    const store = useSetupStore.getState();
+    store.applyPreset("trading");
+    expect(useSetupStore.getState().notice).toBeNull();
+    store.add("nespresso");
+    const custom = useSetupStore.getState().setup;
+    store.applyPreset("studio");
+    expect(useSetupStore.getState().notice?.action).toEqual({
+      kind: "undo",
+      label: "Undo",
+    });
+    store.undo();
+    expect(useSetupStore.getState().setup).toEqual(custom);
+    store.startEmpty();
+    expect(useSetupStore.getState().notice?.message).toBe(
+      "Started from an empty desk.",
     );
   });
 });

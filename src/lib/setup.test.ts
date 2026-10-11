@@ -42,6 +42,7 @@ describe("addItem", () => {
     const result = addItem(setup, "mon-27-4k");
     expect(result.setup).toBe(setup);
     expect(result.notice?.action).toEqual({
+      kind: "upgradeDesk",
       label: "Upgrade to the 160 cm desk",
       deskId: "desk-dual-motor",
       addItemId: "mon-27-4k",

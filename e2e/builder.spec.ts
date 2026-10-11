@@ -241,6 +241,24 @@ test("summary groups fold and unfold", async ({ page, isMobile }) => {
   await expect(line).toBeVisible();
 });
 
+test("removing a line from the summary can be undone", async ({
+  page,
+  isMobile,
+}) => {
+  await page.getByRole("button", { name: "Founders" }).click();
+  const summary = await openSummary(page, isMobile);
+  await summary
+    .getByRole("button", { name: 'Remove 27" 4K Multimedia Monitor' })
+    .click();
+  await expect(summary.getByTestId("summary-line-mon-27-4k")).toHaveCount(0);
+  await closeSummary(page, isMobile);
+  await page.getByRole("button", { name: "Undo" }).click();
+  await expect(page.getByRole("button", { name: "Founders" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+});
+
 test("the builder has no serious accessibility violations", async ({
   page,
 }) => {
