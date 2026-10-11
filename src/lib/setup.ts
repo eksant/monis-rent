@@ -8,6 +8,7 @@ import {
 import type {
   Arrival,
   CatalogItem,
+  CategoryId,
   Notice,
   Plan,
   Posture,
@@ -69,6 +70,33 @@ export function setupLines(setup: Setup): SetupLine[] {
     if (qty > 0) lines.push({ item: entry, qty });
   }
   return lines;
+}
+
+export const CATEGORY_LABELS: Record<CategoryId, string> = {
+  desk: "Desk",
+  chair: "Chair",
+  screen: "Screens",
+  accessory: "Accessories",
+  extra: "Bali extras",
+};
+
+export interface LineGroup {
+  category: CategoryId;
+  label: string;
+  count: number;
+  lines: SetupLine[];
+}
+
+// Lines grouped like the builder's tabs; empty categories are left out.
+export function groupLines(lines: readonly SetupLine[]): LineGroup[] {
+  return (Object.keys(CATEGORY_LABELS) as CategoryId[]).flatMap((category) => {
+    const inGroup = lines.filter((line) => line.item.category === category);
+    if (inGroup.length === 0) return [];
+    const count = inGroup.reduce((sum, line) => sum + line.qty, 0);
+    return [
+      { category, label: CATEGORY_LABELS[category], count, lines: inGroup },
+    ];
+  });
 }
 
 export function summarize(setup: Setup): SetupSummary {

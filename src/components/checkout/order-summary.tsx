@@ -2,6 +2,7 @@
 
 import { Truck } from "lucide-react";
 
+import { GroupedLines } from "@/components/builder/grouped-lines";
 import { PlanToggle } from "@/components/builder/plan-toggle";
 import { useSetupSummary } from "@/components/builder/use-setup-summary";
 import { Badge } from "@/components/ui/badge";
@@ -26,8 +27,11 @@ export function OrderSummary() {
           {countLabel(count, "item")}
         </p>
       </div>
-      <ul className="max-h-52 space-y-2 overflow-y-auto overscroll-contain pr-1 text-sm lg:max-h-[40dvh]">
-        {lines.map(({ item, qty }) => (
+      <GroupedLines
+        lines={lines}
+        plan={plan}
+        className="max-h-60 overflow-y-auto overscroll-contain pr-1 lg:max-h-[45dvh]"
+        renderLine={({ item, qty }) => (
           <li key={item.id} className="flex items-start gap-2">
             <span className="min-w-0 flex-1 leading-snug">
               {qty > 1 ? `${String(qty)} × ` : ""}
@@ -42,8 +46,8 @@ export function OrderSummary() {
               {formatCents(qty * effectiveCents(item, plan))}
             </span>
           </li>
-        ))}
-      </ul>
+        )}
+      />
       <div className="space-y-3 border-t pt-3">
         <PlanToggle />
         <div aria-live="polite">

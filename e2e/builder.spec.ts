@@ -228,6 +228,19 @@ test("counts use the singular for one item", async ({ page, isMobile }) => {
   await expect(summary).toContainText("1 item ·");
 });
 
+test("summary groups fold and unfold", async ({ page, isMobile }) => {
+  await page.getByRole("button", { name: "Founders" }).click();
+  const summary = await openSummary(page, isMobile);
+  const line = summary.getByTestId("summary-line-mon-27-4k");
+  const screens = summary.getByRole("button", { name: /^Screens/ });
+  await expect(line).toBeVisible();
+  await screens.click();
+  await expect(line).toBeHidden();
+  await expect(screens).toContainText("$15.75");
+  await screens.click();
+  await expect(line).toBeVisible();
+});
+
 test("the builder has no serious accessibility violations", async ({
   page,
 }) => {

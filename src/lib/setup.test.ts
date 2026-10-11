@@ -4,6 +4,7 @@ import { emptySetup, PRESETS, presetSetup } from "@/data/presets";
 import {
   addItem,
   deltaCents,
+  groupLines,
   isMultiUnit,
   monitorCapacity,
   normalizeSetup,
@@ -335,4 +336,29 @@ describe("presets under the rules", () => {
       });
     },
   );
+});
+
+describe("groupLines", () => {
+  it("groups lines by the builder's categories, in tab order", () => {
+    const setup: Setup = {
+      ...emptySetup(),
+      chairId: "chair-ergo",
+      items: { nespresso: 1, "mon-24-1c": 2, "lamp-led": 1 },
+    };
+    const groups = groupLines(setupLines(setup));
+    expect(groups.map((group) => [group.label, group.count])).toEqual([
+      ["Desk", 1],
+      ["Chair", 1],
+      ["Screens", 2],
+      ["Accessories", 1],
+      ["Bali extras", 1],
+    ]);
+    expect(groups[2]?.lines.map((line) => line.item.id)).toEqual(["mon-24-1c"]);
+  });
+
+  it("leaves out empty categories", () => {
+    expect(
+      groupLines(setupLines(emptySetup())).map((group) => group.label),
+    ).toEqual(["Desk"]);
+  });
 });

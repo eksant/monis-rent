@@ -3,9 +3,11 @@
 import { Truck, X } from "lucide-react";
 import Link from "next/link";
 
+import { GroupedLines } from "@/components/builder/grouped-lines";
 import { PlanToggle } from "@/components/builder/plan-toggle";
 import { useSetupSummary } from "@/components/builder/use-setup-summary";
 import { useTweenedNumber } from "@/components/builder/use-tweened-number";
+import { SiteCredit } from "@/components/site-credit";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { matchingPresetId, PRESETS } from "@/data/presets";
@@ -20,6 +22,7 @@ export function SummaryPanel() {
   const remove = useSetupStore((state) => state.remove);
   const showCategory = useSetupStore((state) => state.showCategory);
   const { lines, totalCents, savingsCents, arrival } = useSetupSummary();
+  const plan = setup.plan;
   const shownTotal = useTweenedNumber(totalCents);
   const presetName = PRESETS.find(
     (preset) => preset.id === matchingPresetId(setup),
@@ -37,8 +40,11 @@ export function SummaryPanel() {
           {countLabel(count, "item")} · {presetName ?? "Custom"}
         </p>
       </div>
-      <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1 text-sm">
-        {lines.map(({ item, qty }) => (
+      <GroupedLines
+        lines={lines}
+        plan={plan}
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1"
+        renderLine={({ item, qty }) => (
           <li
             key={item.id}
             className="flex items-start gap-2"
@@ -79,8 +85,8 @@ export function SummaryPanel() {
               </button>
             )}
           </li>
-        ))}
-      </ul>
+        )}
+      />
       <div className="shrink-0 space-y-3 border-t pt-3">
         <PlanToggle />
         <div>
@@ -123,6 +129,7 @@ export function SummaryPanel() {
         <Button asChild size="lg" className="h-11 w-full">
           <Link href="/checkout">Rent this setup</Link>
         </Button>
+        <SiteCredit />
       </div>
     </div>
   );
