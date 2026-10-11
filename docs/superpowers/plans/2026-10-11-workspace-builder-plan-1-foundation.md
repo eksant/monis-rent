@@ -6498,4 +6498,5 @@ Recorded after execution on 2026-10-11, so the plan matches what shipped.
   - Catalog search: `src/lib/search.ts` (+ tests), store `search` / `setSearch` (cleared by `showCategory`), `src/components/builder/catalog-search.tsx`, the shadcn `input` component, and search mode in `category-picker.tsx`.
   - App-shell layout: the page never scrolls; only the item list and the summary list scroll. Mobile-first sizing, sit/stand floats over the scene, larger touch targets. New `e2e/layout.spec.ts` checks seven viewport sizes.
   - Playwright serves the production build on port 3100 so `pnpm dev` can keep port 3000.
-- **Totals after execution:** 96 unit tests; 25 E2E passes and 3 by-design skips.
+- **Code review round** (`docs/qa/2026-10-11-code-review.md`): ten findings (CR-01…CR-10) fixed with tests, including `isMultiUnit()`, a route error boundary, accessible item cards, a mobile live region, 32 px touch targets, landscape layout and image fallbacks.
+- **Totals after execution:** 102 unit tests; 35 E2E passes and 5 by-design skips.
