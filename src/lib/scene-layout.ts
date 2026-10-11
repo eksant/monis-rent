@@ -1,6 +1,6 @@
 import { CATALOG, getItem } from "@/data/catalog";
 import { monitorCapacity, usedUnits } from "@/lib/setup";
-import type { CatalogItem, Setup } from "@/lib/types";
+import type { CatalogItem, CategoryId, Setup } from "@/lib/types";
 
 // Scene units are centimetres: a 160 cm desk is 160 units wide.
 export const SCENE = { width: 400, height: 250, floorY: 232 } as const;
@@ -115,6 +115,16 @@ export function layoutMonitors(
   });
 }
 
+const FLOOR_RIGHT = ["tower-fan", "purifier", "dehumidifier"];
+const FLOOR_LEFT = ["plant-monstera", "plant-snake"];
+
+// Standing moves the chair aside: to the right, unless that side is busier.
+function standSide(setup: Setup): 1 | -1 {
+  const count = (ids: string[]): number =>
+    ids.reduce((sum, id) => sum + (setup.items[id] ?? 0), 0);
+  return count(FLOOR_RIGHT) > count(FLOOR_LEFT) ? -1 : 1;
+}
+
 export function layoutScene(setup: Setup): SceneLayout {
   const deskItem = getItem(setup.deskId);
   const width = deskItem.widthCm ?? 120;
@@ -138,6 +148,123 @@ export function layoutScene(setup: Setup): SceneLayout {
             y: last.y + last.height / 2,
           };
   const chairCenterX =
-    SCENE.width / 2 + (setup.posture === "stand" ? CHAIR_STAND_SHIFT : 0);
+    SCENE.width / 2 +
+    (setup.posture === "stand" ? CHAIR_STAND_SHIFT * standSide(setup) : 0);
   return { desk, monitors, chairCenterX, monitorHotspot };
+}
+
+// Scale, then translate (in % of the scene) — the CSS transform for the close-up view.
+export interface FocusTransform {
+  scale: number;
+  x: number;
+  y: number;
+}
+
+export const ROOM_VIEW: FocusTransform = { scale: 1, x: 0, y: 0 };
+const FOCUS_MAX_SCALE = 2.4;
+const FOCUS_SIDE_MARGIN = 22;
+const FOCUS_HEADROOM = 50;
+const FOCUS_BELOW_DESK = 30;
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+// Close-up of the desk: its top, the screens and anything up to lamp height.
+export function deskFocus(layout: SceneLayout): FocusTransform {
+  const { desk, monitors } = layout;
+  const top =
+    Math.min(
+      desk.y - FOCUS_HEADROOM,
+      ...monitors.map((monitor) => monitor.y - 6),
+    ) - 8;
+  const box = {
+    x: desk.x - FOCUS_SIDE_MARGIN,
+    y: top,
+    width: desk.width + 2 * FOCUS_SIDE_MARGIN,
+    height: desk.y + FOCUS_BELOW_DESK - top,
+  };
+  const scale = Math.min(
+    SCENE.width / box.width,
+    SCENE.height / box.height,
+    FOCUS_MAX_SCALE,
+  );
+  const tx = clamp(
+    SCENE.width / 2 - scale * (box.x + box.width / 2),
+    SCENE.width - scale * SCENE.width,
+    0,
+  );
+  const ty = clamp(
+    SCENE.height / 2 - scale * (box.y + box.height / 2),
+    SCENE.height - scale * SCENE.height,
+    0,
+  );
+  return { scale, x: (tx / SCENE.width) * 100, y: (ty / SCENE.height) * 100 };
+}
+
+// Where a scene point ends up on screen (in scene units) under a transform.
+export function projectPoint(focus: FocusTransform, point: Point): Point {
+  return {
+    x: focus.scale * point.x + (focus.x / 100) * SCENE.width,
+    y: focus.scale * point.y + (focus.y / 100) * SCENE.height,
+  };
+}
+
+export function isInFrame(point: Point): boolean {
+  return (
+    point.x >= 0 &&
+    point.x <= SCENE.width &&
+    point.y >= 0 &&
+    point.y <= SCENE.height
+  );
+}
+
+export interface SceneTarget {
+  key: string;
+  label: string;
+  category: CategoryId;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+const CHAIR_HALF_WIDTH = 26;
+const CHAIR_HEIGHT = 114;
+
+// Tap areas over the desk, each screen and the chair that open their category.
+export function sceneTargets(setup: Setup, layout: SceneLayout): SceneTarget[] {
+  const { desk } = layout;
+  const targets: SceneTarget[] = [
+    {
+      key: "desk",
+      label: "Change desk",
+      category: "desk",
+      x: desk.x,
+      y: desk.y - 2,
+      width: desk.width,
+      height: 14,
+    },
+    ...layout.monitors.map((monitor) => ({
+      key: monitor.key,
+      label: "Change screens",
+      category: "screen" as const,
+      x: monitor.x,
+      y: monitor.y,
+      width: monitor.width,
+      height: monitor.height,
+    })),
+  ];
+  if (setup.chairId !== null) {
+    targets.push({
+      key: "chair",
+      label: "Change chair",
+      category: "chair",
+      x: layout.chairCenterX - CHAIR_HALF_WIDTH,
+      y: SCENE.floorY - CHAIR_HEIGHT,
+      width: 2 * CHAIR_HALF_WIDTH,
+      height: CHAIR_HEIGHT,
+    });
+  }
+  return targets;
 }
