@@ -19,13 +19,19 @@ export function SceneViewToggle() {
         if (value === "room" || value === "desk") setView(value);
       }}
       aria-label="Scene view"
-      className="rounded-lg bg-white/90 shadow-sm backdrop-blur"
+      className="bg-transparent"
     >
-      <ToggleGroupItem value="room" className="h-8 px-2.5">
+      <ToggleGroupItem
+        value="room"
+        className="h-8 bg-white/90 px-2.5 shadow-sm backdrop-blur"
+      >
         <Maximize2 aria-hidden />
         Room
       </ToggleGroupItem>
-      <ToggleGroupItem value="desk" className="h-8 px-2.5">
+      <ToggleGroupItem
+        value="desk"
+        className="h-8 bg-white/90 px-2.5 shadow-sm backdrop-blur"
+      >
         <ZoomIn aria-hidden />
         Close-up
       </ToggleGroupItem>

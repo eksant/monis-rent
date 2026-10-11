@@ -19,13 +19,19 @@ export function PostureToggle() {
         if (value === "sit" || value === "stand") choosePosture(value);
       }}
       aria-label="Desk height"
-      className="rounded-lg bg-white/90 shadow-sm backdrop-blur"
+      className="bg-transparent"
     >
-      <ToggleGroupItem value="sit" className="h-8 px-2.5">
+      <ToggleGroupItem
+        value="sit"
+        className="h-8 bg-white/90 px-2.5 shadow-sm backdrop-blur"
+      >
         <Armchair aria-hidden />
         Sit
       </ToggleGroupItem>
-      <ToggleGroupItem value="stand" className="h-8 px-2.5">
+      <ToggleGroupItem
+        value="stand"
+        className="h-8 bg-white/90 px-2.5 shadow-sm backdrop-blur"
+      >
         <PersonStanding aria-hidden />
         Stand
       </ToggleGroupItem>

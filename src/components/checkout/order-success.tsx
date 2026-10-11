@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { ShareButton } from "@/components/builder/share-button";
 import { SiteHeader } from "@/components/builder/site-header";
 import { BackToBuilder } from "@/components/checkout/checkout";
+import { SiteCredit } from "@/components/site-credit";
 import { Button } from "@/components/ui/button";
 import { formatDeliveryDate } from "@/lib/checkout";
 import { formatCents } from "@/lib/money";
@@ -110,7 +111,7 @@ export function OrderSuccess() {
                 ))}
               </ol>
             </section>
-            <div className="flex flex-wrap justify-center gap-2 pb-4">
+            <div className="flex flex-wrap justify-center gap-2">
               <ShareButton />
               <Button
                 size="lg"
@@ -133,6 +134,7 @@ export function OrderSuccess() {
                 </a>
               </Button>
             </div>
+            <SiteCredit className="pb-4 text-center text-xs text-muted-foreground" />
           </div>
         )}
       </main>
