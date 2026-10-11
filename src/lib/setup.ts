@@ -124,9 +124,15 @@ function fullSlotNotice(setup: Setup, entry: CatalogItem): Notice {
   if (entry.slot !== "monitor")
     return { message: "There's no room for that one." };
   const desk = getItem(setup.deskId);
-  const upgrade = wideDesk();
-  if (upgrade === undefined || (desk.widthCm ?? 0) >= WIDE_DESK_CM) {
+  if ((desk.widthCm ?? 0) >= WIDE_DESK_CM) {
     return { message: "Your desk is full. Swap a screen to try another one." };
+  }
+  const upgrade = wideDesk();
+  const needed = usedUnits(setup, "monitor") + entry.slotSize;
+  if (upgrade === undefined || needed > monitorCapacity(upgrade.id)) {
+    return {
+      message: `Your ${String(desk.widthCm)} cm desk has no room for another screen. Remove one first.`,
+    };
   }
   return {
     message: `Your ${String(desk.widthCm)} cm desk has no room for another screen.`,
@@ -230,17 +236,17 @@ export function addItem(setup: Setup, id: string): SetupResult {
     const items = { ...withoutSlot(setup.items, entry.slot), [id]: 1 };
     return afterAdd({ ...setup, items }, entry);
   }
-  if (
-    usedUnits(setup, entry.slot) + entry.slotSize >
-    slotCapacity(setup, entry.slot)
-  ) {
-    return { setup, notice: fullSlotNotice(setup, entry) };
-  }
   if (qty >= entry.maxQty) {
     return {
       setup,
       notice: { message: "You've added the maximum for this item." },
     };
+  }
+  if (
+    usedUnits(setup, entry.slot) + entry.slotSize >
+    slotCapacity(setup, entry.slot)
+  ) {
+    return { setup, notice: fullSlotNotice(setup, entry) };
   }
   return afterAdd(
     { ...setup, items: { ...setup.items, [id]: qty + 1 } },
@@ -260,15 +266,23 @@ export function removeItem(setup: Setup, id: string): SetupResult {
   return dropOrphans({ ...setup, items: decrement(setup.items, id) });
 }
 
-// Item-card tap: select, swap or deselect; multi-unit slots always add one more.
-export function toggleItem(setup: Setup, id: string): SetupResult {
+// Monitors and plants can be added more than once; everything else toggles.
+export function isMultiUnit(setup: Setup, id: string): boolean {
   const entry = findItem(id);
-  if (entry === undefined) return { setup };
-  const multi =
-    entry.category !== "desk" &&
-    entry.category !== "chair" &&
-    slotCapacity(setup, entry.slot) > 1;
-  if (!multi && isSelected(setup, id)) return removeItem(setup, id);
+  if (
+    entry === undefined ||
+    entry.category === "desk" ||
+    entry.category === "chair"
+  ) {
+    return false;
+  }
+  return entry.maxQty > 1 && slotCapacity(setup, entry.slot) > 1;
+}
+
+// Item-card tap: select, swap or deselect; multi-unit items always add one more.
+export function toggleItem(setup: Setup, id: string): SetupResult {
+  if (!isMultiUnit(setup, id) && isSelected(setup, id))
+    return removeItem(setup, id);
   return addItem(setup, id);
 }
 
@@ -286,8 +300,9 @@ export function deltaCents(setup: Setup, id: string): number {
       priceOf(setup.chairId === null ? undefined : getItem(setup.chairId))
     );
   }
-  if (slotCapacity(setup, entry.slot) > 1) return price;
+  if (isMultiUnit(setup, id)) return price;
   if (isSelected(setup, id)) return -price;
+  if (slotCapacity(setup, entry.slot) > 1) return price;
   return price - priceOf(occupant(setup, entry.slot));
 }
 

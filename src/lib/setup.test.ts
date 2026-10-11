@@ -4,6 +4,7 @@ import { emptySetup, PRESETS, presetSetup } from "@/data/presets";
 import {
   addItem,
   deltaCents,
+  isMultiUnit,
   monitorCapacity,
   normalizeSetup,
   parseSetup,
@@ -52,12 +53,29 @@ describe("addItem", () => {
     expect(addItem(setup, "mon-24-1c").notice?.message).toMatch(/no room/);
   });
 
-  it("fits three monitors on the 160 cm desk with no upgrade offer", () => {
-    let setup = withItems({ "mon-24-1c": 3 }, "desk-dual-motor");
-    const result = addItem(setup, "mon-24-1c");
-    expect(result.notice?.action).toBeUndefined();
-    setup = result.setup;
+  it("fits a third monitor on the 160 cm desk, then offers no upgrade", () => {
+    let setup = withItems({ "mon-24-1c": 2 }, "desk-dual-motor");
+    setup = addItem(setup, "mon-24-1c").setup;
     expect(setup.items["mon-24-1c"]).toBe(3);
+    const result = addItem(setup, "mon-27-4k");
+    expect(result.setup).toBe(setup);
+    expect(result.notice?.action).toBeUndefined();
+  });
+
+  it("offers no wider desk when the screen would not fit there either", () => {
+    const setup = withItems({ "mon-24-1c": 2 });
+    const result = addItem(setup, "mon-34-curved");
+    expect(result.setup).toBe(setup);
+    expect(result.notice?.action).toBeUndefined();
+    expect(result.notice?.message).toMatch(/no room/);
+  });
+
+  it("checks the per-item limit before the desk capacity", () => {
+    const result = addItem(withItems({ "mon-34-gaming": 1 }), "mon-34-gaming");
+    expect(result.notice?.action).toBeUndefined();
+    expect(result.notice?.message).toBe(
+      "You've added the maximum for this item.",
+    );
   });
 
   it("swaps items in single-capacity slots", () => {
@@ -170,6 +188,24 @@ describe("toggleItem", () => {
   });
 });
 
+describe("isMultiUnit", () => {
+  it("is true only for items that can be added more than once", () => {
+    const setup = withItems({});
+    expect(isMultiUnit(setup, "mon-24-1c")).toBe(true);
+    expect(isMultiUnit(setup, "plant-snake")).toBe(true);
+    expect(isMultiUnit(setup, "mon-34-gaming")).toBe(false);
+    expect(isMultiUnit(setup, "lamp-led")).toBe(false);
+    expect(isMultiUnit(setup, "desk-electric")).toBe(false);
+    expect(isMultiUnit(setup, "unknown")).toBe(false);
+  });
+
+  it("lets a selected single-unit monitor be deselected by tapping it", () => {
+    const trading = withItems({ "mon-34-gaming": 1 });
+    expect(toggleItem(trading, "mon-34-gaming").setup.items).toEqual({});
+    expect(deltaCents(trading, "mon-34-gaming")).toBe(-1840);
+  });
+});
+
 describe("deltaCents", () => {
   it("shows the swap difference within a slot", () => {
     // MX Master 400 → Silent mouse 200
@@ -178,6 +214,12 @@ describe("deltaCents", () => {
 
   it("shows a negative price for a selected single item", () => {
     expect(deltaCents(withItems({ "lamp-led": 1 }), "lamp-led")).toBe(-320);
+  });
+
+  it("shows the full price for a monitor added next to another one", () => {
+    expect(deltaCents(withItems({ "mon-34-gaming": 1 }), "mon-34-curved")).toBe(
+      2300,
+    );
   });
 
   it("shows the full price for one more monitor", () => {
