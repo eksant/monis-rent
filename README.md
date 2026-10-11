@@ -13,7 +13,7 @@ Design your Bali workspace visually, see the price instantly, and rent it. Built
 - **Start from a real bundle** (Essentials, Founders, Trading, Studio) or **describe your work** in one sentence ("Video editor in Canggu, 2 months, $120/wk") and get a setup with the reasons behind it, plus Undo.
 - **Swap anything:** 3 desks, 3 chairs, 8 screens, lamps, peripherals, plants and Bali extras (Starlink, dehumidifier, coffee). Search finds items across all categories.
 - **Watch it come to life:** an SVG scene drawn to scale (1 unit = 1 cm). Items drop in, the desk rises when you switch to standing, and screens line up and angle themselves when the desk gets crowded.
-- **Close-up view:** one tap zooms into the desk. Tap the desk, a screen or the chair to jump to its options.
+- **Close-up view:** one tap zooms into the desk; drag to look around. Tap the desk, a screen or the chair to jump to its options.
 - **Always know the price and timing:** weekly or monthly total, monthly savings, and "can arrive today" or "arrives tomorrow" from the monis.rent delivery data.
 - **Share the setup** as a link, then **rent it** through a checkout that ends with a clear confirmation.
 

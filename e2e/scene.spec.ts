@@ -51,3 +51,33 @@ test("an empty setup offers a chair hotspot", async ({ page }) => {
     "true",
   );
 });
+
+test("dragging the close-up looks around without opening anything", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("radio", { name: "Close-up" }).click();
+  const camera = page.getByTestId("scene-camera");
+  await expect(page.getByTestId("scene-frame")).toHaveAttribute(
+    "data-view",
+    "desk",
+  );
+  const transform = (): Promise<string> =>
+    camera.evaluate((element) => getComputedStyle(element).transform);
+  await expect.poll(transform).not.toBe("none");
+  const before = await transform();
+  const chair = await page
+    .getByRole("button", { name: "Change chair" })
+    .boundingBox();
+  if (chair === null) throw new Error("chair target not found");
+  const start = { x: chair.x + chair.width / 2, y: chair.y + chair.height / 3 };
+  await page.mouse.move(start.x, start.y);
+  await page.mouse.down();
+  await page.mouse.move(start.x + 120, start.y + 30, { steps: 8 });
+  await page.mouse.up();
+  await expect.poll(transform).not.toBe(before);
+  await expect(page.getByRole("tab", { name: "Chair" })).toHaveAttribute(
+    "aria-selected",
+    "false",
+  );
+});

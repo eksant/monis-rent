@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Move, Plus } from "lucide-react";
 
 import { ChairArt } from "@/components/scene/chair-art";
 import { DeskLegs, DeskTop } from "@/components/scene/desk-art";
@@ -8,6 +8,7 @@ import { BackDeskItems, DeskItems } from "@/components/scene/desk-items";
 import { FloorItems } from "@/components/scene/floor-items";
 import { MonitorArt } from "@/components/scene/monitor-art";
 import { Room } from "@/components/scene/room";
+import { useScenePan } from "@/components/scene/use-scene-pan";
 import { getItem } from "@/data/catalog";
 import {
   DESK_HEIGHT,
@@ -21,6 +22,7 @@ import {
 } from "@/lib/scene-layout";
 import { setupLines } from "@/lib/setup";
 import type { CategoryId, Setup } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface Hotspot {
   label: string;
@@ -58,7 +60,11 @@ export function WorkspaceScene({
   const lift =
     setup.posture === "stand" ? DESK_HEIGHT.stand - DESK_HEIGHT.sit : 0;
   const deskItem = getItem(setup.deskId);
-  const focus = view === "desk" ? deskFocus(actual) : ROOM_VIEW;
+  const pan = useScenePan(
+    view,
+    view === "desk" ? deskFocus(actual) : ROOM_VIEW,
+  );
+  const focus = pan.focus;
   const hasLamp = (setup.items["lamp-led"] ?? 0) > 0;
   const plantCount =
     (setup.items["plant-monstera"] ?? 0) + (setup.items["plant-snake"] ?? 0);
@@ -103,15 +109,24 @@ export function WorkspaceScene({
   const targets = onEdit === undefined ? [] : sceneTargets(setup, actual);
   return (
     <div
-      className="relative w-full overflow-hidden"
+      className={cn(
+        "relative w-full overflow-hidden select-none",
+        view === "desk" && (pan.dragging ? "cursor-grabbing" : "cursor-grab"),
+      )}
       style={{
         aspectRatio: `${String(SCENE.width)} / ${String(SCENE.height)}`,
+        touchAction: view === "desk" ? "none" : "auto",
       }}
       data-testid="scene-frame"
       data-view={view}
+      {...pan.handlers}
     >
       <div
-        className="absolute inset-0 origin-top-left transition-transform duration-500 ease-out motion-reduce:transition-none"
+        className={cn(
+          "absolute inset-0 origin-top-left",
+          !pan.dragging &&
+            "transition-transform duration-500 ease-out motion-reduce:transition-none",
+        )}
         style={{
           transform: `translate(${String(focus.x)}%, ${String(focus.y)}%) scale(${String(focus.scale)})`,
         }}
@@ -211,6 +226,12 @@ export function WorkspaceScene({
           </button>
         ))}
       </div>
+      {view === "desk" ? (
+        <p className="pointer-events-none absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-white/85 px-2.5 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur">
+          <Move className="size-3.5" aria-hidden />
+          Drag to look around
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -67,5 +67,5 @@ user action ─▶ store action ─▶ lib/setup rule ─▶ { setup, notice? }
 - The scene is laid out at sitting height; standing lifts the desk group with a CSS transform so the change animates (and is instant with reduced motion).
 - Monitors are centred on the desk with the largest one in the middle. When a row is wider than the desk, side screens are drawn narrower, as if angled.
 - The "+" hotspots and the tap targets (desk, screens, chair) are real HTML buttons positioned over the SVG, which itself is a single `role="img"` with a text summary.
-- **Close-up:** a two-position view. `deskFocus()` computes a CSS `translate() scale()` for a wrapper around the SVG and the buttons, so everything zooms together; hotspots are counter-scaled and hidden when out of frame.
+- **Close-up:** a two-position view. `deskFocus()` computes a CSS `translate() scale()` for a wrapper around the SVG and the buttons, so everything zooms together; hotspots are counter-scaled and hidden when out of frame. In the close-up, `useScenePan` lets people drag to look around: `panFocus()` clamps the offset to the scene edges, and the click that ends a drag is swallowed so it never triggers a tap target.
 - **Motion:** items drop in with a CSS keyframe animation, totals count up with `useTweenedNumber`, and everything is instant under `prefers-reduced-motion`.

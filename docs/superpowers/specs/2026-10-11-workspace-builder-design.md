@@ -227,7 +227,7 @@ item cards (1 column; 2 on tablets)  ↕ scroll
 ### 7.4 Interactions
 
 - **Search** sits above the tabs and searches every category: prefix matches on names, benefits, tags and groups, a few synonyms (screen/display/monitor, wifi/internet, light/lamp, computer/mac, coffee/espresso) and plurals. Whole-word and name matches rank first. Results replace the tabs, grouped by category, with a count. No results shows suggestion chips. `/` focuses the search on desktop; Esc, the × button or opening a category clears it.
-- **Close-up view (milestone 4):** a two-position toggle switches the scene between the whole room and a close-up of the desk, with a smooth transition. Tapping an item in the scene opens its category and switches to the close-up. No free zoom or pan.
+- **Close-up view (milestone 4):** a two-position toggle switches the scene between the whole room and a close-up of the desk, with a smooth transition. Tapping an item in the scene opens its category and switches to the close-up. In the close-up, dragging (mouse or touch) pans around the scene within its edges; a drag never counts as a tap. There is no free zoom.
 - **Tapping an item in the scene** highlights it and opens its category in the picker (milestone 4).
 - **(+) hotspots** sit on empty slots: monitor slots, desk lamp, plant.
 - **Tapping an item card** toggles it: add, or remove when already added. In a slot with capacity 1 it swaps. Multi-unit items (monitors, plants) show a − / + stepper.

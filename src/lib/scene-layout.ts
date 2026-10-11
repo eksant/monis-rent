@@ -202,6 +202,19 @@ export function deskFocus(layout: SceneLayout): FocusTransform {
   return { scale, x: (tx / SCENE.width) * 100, y: (ty / SCENE.height) * 100 };
 }
 
+// Shifts a view by (dx, dy) % of the scene, never past the scene edges.
+export function panFocus(
+  focus: FocusTransform,
+  dx: number,
+  dy: number,
+): FocusTransform {
+  return {
+    scale: focus.scale,
+    x: clamp(focus.x + dx, 100 - 100 * focus.scale, 0),
+    y: clamp(focus.y + dy, 100 - 100 * focus.scale, 0),
+  };
+}
+
 // Where a scene point ends up on screen (in scene units) under a transform.
 export function projectPoint(focus: FocusTransform, point: Point): Point {
   return {

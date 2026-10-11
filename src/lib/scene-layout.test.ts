@@ -10,6 +10,7 @@ import {
   layoutScene,
   MONITOR_OVERHANG,
   monitorSize,
+  panFocus,
   projectPoint,
   ROOM_VIEW,
   SCENE,
@@ -238,5 +239,22 @@ describe("chair placement when standing", () => {
     const plants: Setup = { ...climate, items: { "plant-monstera": 2 } };
     expect(layoutScene(climate).chairCenterX).toBeLessThan(SCENE.width / 2);
     expect(layoutScene(plants).chairCenterX).toBeGreaterThan(SCENE.width / 2);
+  });
+});
+
+describe("panFocus", () => {
+  const focus: FocusTransform = { scale: 2, x: -50, y: -40 };
+
+  it("moves the close-up by the given percentages", () => {
+    expect(panFocus(focus, 10, -5)).toEqual({ scale: 2, x: -40, y: -45 });
+  });
+
+  it("stops at the scene edges", () => {
+    expect(panFocus(focus, 500, 500)).toEqual({ scale: 2, x: 0, y: 0 });
+    expect(panFocus(focus, -500, -500)).toEqual({ scale: 2, x: -100, y: -100 });
+  });
+
+  it("cannot move the room view", () => {
+    expect(panFocus(ROOM_VIEW, 20, 20)).toEqual(ROOM_VIEW);
   });
 });
