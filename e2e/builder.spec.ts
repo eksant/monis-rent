@@ -1,0 +1,151 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
+
+import { addFromCard, closeSummary, openSummary } from "./helpers";
+
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("workspace-scene")).toBeVisible();
+});
+
+test("first visit shows the Essentials setup with price and arrival", async ({
+  page,
+  isMobile,
+}) => {
+  await expect(page.getByTestId("scene-desk-electric")).toBeVisible();
+  await expect(page.getByTestId("scene-chair-ergo")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Essentials" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  const summary = await openSummary(page, isMobile);
+  await expect(summary.getByTestId("summary-total")).toHaveText(
+    "$12.70 / week",
+  );
+  await expect(summary.getByTestId("summary-arrival")).toHaveText(
+    "Arrives tomorrow",
+  );
+});
+
+test("swapping desk and chair updates the scene and summary", async ({
+  page,
+  isMobile,
+}) => {
+  await addFromCard(page, "desk-dual-motor");
+  await expect(page.getByTestId("scene-desk-dualMotor")).toBeVisible();
+  await page.getByRole("tab", { name: "Chair" }).click();
+  await addFromCard(page, "chair-basic");
+  await expect(page.getByTestId("scene-chair-basic")).toBeVisible();
+  const summary = await openSummary(page, isMobile);
+  await expect(
+    summary.getByTestId("summary-line-desk-dual-motor"),
+  ).toBeVisible();
+  await expect(summary.getByTestId("summary-line-chair-basic")).toBeVisible();
+});
+
+test("a full desk offers an upgrade that adds the third screen", async ({
+  page,
+}) => {
+  await page.getByRole("tab", { name: "Screens" }).click();
+  await addFromCard(page, "mon-24-1c");
+  await page
+    .getByRole("button", { name: 'Add another 24" Full HD Office Monitor 1C' })
+    .click();
+  await addFromCard(page, "mon-27-4k");
+  await page
+    .getByRole("button", { name: "Upgrade to the 160 cm desk" })
+    .click();
+  await expect(page.getByTestId("scene-desk-dualMotor")).toBeVisible();
+  await expect(page.locator('[data-testid^="scene-monitor-"]')).toHaveCount(3);
+});
+
+test("the plan toggle switches totals and savings", async ({
+  page,
+  isMobile,
+}) => {
+  const summary = await openSummary(page, isMobile);
+  await summary.getByRole("radio", { name: "Monthly" }).click();
+  await expect(summary.getByTestId("summary-total")).toHaveText(
+    "$34.80 / month",
+  );
+  await expect(summary.getByTestId("summary-savings")).toHaveText(
+    "You save $20.23 vs weekly billing.",
+  );
+});
+
+test("standing raises the desk", async ({ page }) => {
+  await page.getByRole("radio", { name: "Stand" }).click();
+  await expect(page.getByTestId("workspace-scene")).toHaveAttribute(
+    "data-posture",
+    "stand",
+  );
+});
+
+test("a shared link rebuilds the same setup", async ({
+  page,
+  context,
+  browser,
+  isMobile,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.getByRole("button", { name: "Founders" }).click();
+  await page.getByTestId("share-button").click();
+  const url = await page.evaluate(() => navigator.clipboard.readText());
+  expect(url).toContain("i=mon-27-4k");
+
+  const fresh = await browser.newContext(
+    isMobile
+      ? {
+          viewport: { width: 412, height: 915 },
+          isMobile: true,
+          hasTouch: true,
+        }
+      : {},
+  );
+  const other = await fresh.newPage();
+  await other.goto(url);
+  await expect(other.getByRole("button", { name: "Founders" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(other).toHaveURL(/\/$/);
+  await fresh.close();
+});
+
+test("the setup survives a reload", async ({ page, isMobile }) => {
+  await page.getByRole("button", { name: "Trading" }).click();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Trading" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  const summary = await openSummary(page, isMobile);
+  await expect(summary.getByTestId("summary-total")).toHaveText(
+    "$48.20 / week",
+  );
+  await closeSummary(page, isMobile);
+});
+
+test("mobile shows a sticky price bar that opens the summary", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile, "mobile only");
+  await expect(page.getByTestId("price-bar")).toBeVisible();
+  const summary = await openSummary(page, isMobile);
+  await expect(
+    summary.getByRole("link", { name: "Rent this setup" }),
+  ).toBeVisible();
+});
+
+test("the builder has no serious accessibility violations", async ({
+  page,
+}) => {
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa"])
+    .analyze();
+  const serious = results.violations.filter(
+    (violation) =>
+      violation.impact === "serious" || violation.impact === "critical",
+  );
+  expect(serious.map((violation) => violation.id)).toEqual([]);
+});

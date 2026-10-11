@@ -60,8 +60,9 @@ export function WorkspaceScene({
     hotspots.push({
       label: "Add a lamp",
       category: "accessory",
-      x: actual.desk.x + 10,
-      y: actual.desk.y - 20,
+      // Where the lamp head would be, clear of the laptop.
+      x: actual.desk.x + 8,
+      y: actual.desk.y - 48,
     });
   }
   if (onHotspot !== undefined && plantCount < 2) {
