@@ -1,5 +1,6 @@
 "use client";
 
+import { SmartSetup } from "@/components/builder/smart-setup";
 import { matchingPresetId, PRESETS } from "@/data/presets";
 import { cn } from "@/lib/utils";
 import { useSetupStore } from "@/store/setup-store";
@@ -18,6 +19,9 @@ export function PresetBar() {
       className="mx-auto w-full max-w-[1600px] shrink-0"
     >
       <ul className="flex snap-x gap-2 overflow-x-auto px-3 py-2 sm:px-4 short:py-1 [&::-webkit-scrollbar]:hidden">
+        <li className="snap-start">
+          <SmartSetup />
+        </li>
         {PRESETS.map((preset) => (
           <li key={preset.id} className="snap-start">
             <button
