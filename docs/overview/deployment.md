@@ -4,7 +4,7 @@
 
 - Project linked to the GitHub repo `eksant/monis-rent` through Vercel's Git integration.
 - Framework preset: Next.js. Install command: `pnpm install` (detected from `packageManager`). Node.js 22.
-- Every push to `main` deploys to production: **https://monis-rent-theta.vercel.app**. The repo has a single branch (`main`), so there are no preview deployments in the normal flow.
+- Every push to `main` deploys to production: **https://monis-rent-arbeitsplatz.vercel.app**. The repo has a single branch (`main`), so there are no preview deployments in the normal flow.
 - No environment variables are needed.
 
 ### One-time setup (owner)

@@ -78,7 +78,7 @@ The owner keeps a single branch: **`main`**. Do not create feature branches or p
 2. Before pushing, run: `pnpm lint && pnpm type-check && pnpm format:check && pnpm test && pnpm build && pnpm test:e2e`.
 3. Commit (Conventional Commits) and `git push`. CI runs on the push and Vercel deploys production.
 4. Watch CI with `gh run watch`. If a run fails, fix it, push again, and then **delete the failed runs** (`gh run list --status failure`, `gh run delete <id>`), so the Actions history only shows the resolved state.
-5. Check production: `BASE_URL=https://monis-rent-theta.vercel.app pnpm test:e2e`.
+5. Check production: `BASE_URL=https://monis-rent-arbeitsplatz.vercel.app pnpm test:e2e`.
 6. For larger changes, have an independent reviewer read the diff before pushing.
 
 ## QA and bugs
@@ -93,4 +93,4 @@ These are the project-specific inputs for the `qa-fix-round` procedure.
 
 ## Deployment
 
-Vercel project linked to `eksant/monis-rent` through Git integration: every push to `main` deploys production at https://monis-rent-theta.vercel.app. No environment variables are needed. See `docs/overview/deployment.md`.
+Vercel project linked to `eksant/monis-rent` through Git integration: every push to `main` deploys production at https://monis-rent-arbeitsplatz.vercel.app. No environment variables are needed. See `docs/overview/deployment.md`.

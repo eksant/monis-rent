@@ -5150,7 +5150,7 @@ Expected: two PNGs in `docs/assets/` (about 250 KB and 100 KB). Open them and ch
 ````markdown
 # monis.rent Workspace Builder
 
-**Live:** https://monis-rent-theta.vercel.app
+**Live:** https://monis-rent-arbeitsplatz.vercel.app
 
 Design your Bali workspace visually, see the price instantly, and rent it. Built for the Desent Solutions developer challenge, for their client [monis.rent](https://www.monis.rent), which rents office equipment to digital nomads and startups in Bali.
 
@@ -5356,7 +5356,7 @@ index 8542f8c..7a74717 100644
 -| M3  | Add accessories (monitors, lamps, plants, etc.)           | Done                             | Screens, Accessories and Bali tabs     |
 -| M4  | Workspace preview updates visually as items change        | Done                             | SVG scene                              |
 -| M5  | Summary or checkout view of the selected setup            | Partial (summary; checkout next) | Summary panel, `/checkout`             |
--| M6  | Deployed and reachable through a public URL               | Done                             | https://monis-rent-theta.vercel.app    |
+-| M6  | Deployed and reachable through a public URL               | Done                             | https://monis-rent-arbeitsplatz.vercel.app    |
 -| M7  | Code on GitHub with `desent-bot` as a collaborator (Read) | Planned                          | `eksant/monis-rent`                    |
 +| #   | Requirement                                               | Status                       | Where                                           |
 +| --- | --------------------------------------------------------- | ---------------------------- | ----------------------------------------------- |
@@ -5365,12 +5365,12 @@ index 8542f8c..7a74717 100644
 +| M3  | Add accessories (monitors, lamps, plants, etc.)           | Done                         | Screens, Accessories and Bali tabs              |
 +| M4  | Workspace preview updates visually as items change        | Done                         | SVG scene                                       |
 +| M5  | Summary or checkout view of the selected setup            | Done                         | Summary panel, `/checkout`, `/checkout/success` |
-+| M6  | Deployed and reachable through a public URL               | Done                         | https://monis-rent-theta.vercel.app             |
++| M6  | Deployed and reachable through a public URL               | Done                         | https://monis-rent-arbeitsplatz.vercel.app             |
 +| M7  | Code on GitHub with `desent-bot` as a collaborator (Read) | Planned (invite at hand-off) | `eksant/monis-rent`                             |
  
  ## Submission checklist
  
- - [x] Live URL that works immediately: https://monis-rent-theta.vercel.app
+ - [x] Live URL that works immediately: https://monis-rent-arbeitsplatz.vercel.app
  - [ ] GitHub repository with `desent-bot` (Read access)
 -- [ ] Short write-up in `README.md`: approach, tech choices, what we would improve
 +- [x] Short write-up in `README.md`: approach, tech choices, what we would improve
@@ -5429,7 +5429,7 @@ gh run watch $(gh run list --branch main --limit 1 --json databaseId --jq '.[0].
 #   gh run list --status failure --json databaseId --jq '.[].databaseId' | xargs -n1 gh run delete
 ```
 ```bash
-BASE_URL=https://monis-rent-theta.vercel.app pnpm test:e2e
+BASE_URL=https://monis-rent-arbeitsplatz.vercel.app pnpm test:e2e
 ```
 
 Expected: 58 passed, 6 skipped by design, against production.
@@ -5474,7 +5474,7 @@ gh run watch $(gh run list --branch main --limit 1 --json databaseId --jq '.[0].
 
 - [ ] **Step 4: Final check and report**
 
-Run `BASE_URL=https://monis-rent-theta.vercel.app pnpm test:e2e` once more. Report to the owner in Indonesian:
+Run `BASE_URL=https://monis-rent-arbeitsplatz.vercel.app pnpm test:e2e` once more. Report to the owner in Indonesian:
 - the live URL;
 - what shipped;
 - the test results;

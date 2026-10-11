@@ -1,6 +1,6 @@
 # monis.rent Workspace Builder
 
-**Live:** https://monis-rent-theta.vercel.app
+**Live:** https://monis-rent-arbeitsplatz.vercel.app
 
 Design your Bali workspace visually, see the price instantly, and rent it. Built for the Desent Solutions developer challenge, for their client [monis.rent](https://www.monis.rent), which rents office equipment to digital nomads and startups in Bali.
 
