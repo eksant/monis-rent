@@ -15,6 +15,10 @@
 4. Copy the production URL into `README.md` and the repo's "Website" field.
 5. Deployment URLs and previews are behind Vercel Authentication by default. The production domain is public.
 
+## Branch protection
+
+A repository ruleset, **protect-main**, guards `main`: no deletion, no force-push, and changes must come through a pull request. Repository admins (the owner) bypass it, so the owner still pushes straight to `main`. Collaborators on a personal-account repo always get write access, so this ruleset is what keeps the `desent-bot` reviewer effectively read-only.
+
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on every push to `main` (and on pull requests, if one is ever opened): install, lint, type-check, format check, unit tests, build, then Playwright (Chromium, desktop and mobile projects). The Playwright HTML report is uploaded as an artifact. Failed runs are deleted once the fix is pushed (`gh run delete <id>`).

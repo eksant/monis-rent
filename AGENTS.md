@@ -72,7 +72,7 @@ docs/                 overview, product notes, specs and plans, QA rounds, bug l
 
 ## Shipping a change
 
-The owner keeps a single branch: **`main`**. Do not create feature branches or pull requests.
+The owner keeps a single branch: **`main`**. Do not create feature branches or pull requests. The `protect-main` ruleset blocks deletion and force-push; admins bypass its pull-request rule.
 
 1. `git pull --ff-only` on `main`.
 2. Before pushing, run: `pnpm lint && pnpm type-check && pnpm format:check && pnpm test && pnpm build && pnpm test:e2e`.
